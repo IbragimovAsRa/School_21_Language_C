@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "C3_SimpleBashUtils_0_master",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "C3_SimpleBashUtils_0_master::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-C3_SimpleBashUtils_0_master-Debug-cd5954f8798a3d5e29d6.json",
+					"name" : "C3_SimpleBashUtils_0_master",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/aslan/Desktop/School_21/C3_SimpleBashUtils-0-master/cmake-build-debug",
+		"source" : "/home/aslan/Desktop/School_21/C3_SimpleBashUtils-0-master"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
