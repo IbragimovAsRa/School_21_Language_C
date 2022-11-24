@@ -1,3 +1,0 @@
-/home/aslan/Desktop/School_21/C3_SimpleBashUtils-0-master/cmake-build-debug/CMakeFiles/C3_SimpleBashUtils_0_master.dir
-/home/aslan/Desktop/School_21/C3_SimpleBashUtils-0-master/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/aslan/Desktop/School_21/C3_SimpleBashUtils-0-master/cmake-build-debug/CMakeFiles/rebuild_cache.dir
