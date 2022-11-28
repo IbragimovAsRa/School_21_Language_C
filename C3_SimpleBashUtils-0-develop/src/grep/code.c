@@ -466,3 +466,43 @@ void output(command_line_options options, char *str, int count, bool multi_files
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+regex_t regex;
+//        regcomp(&regex, config.options, config.cflag);
+//        regmatch_t reg_match[1];
+//        int match = 0;
+//        int helper = 0;
+//        while (match == 0) {
+//            match = regexec(&regex, config.str + helper, 1, reg_match, 0);
+//            if (match == 0) {
+//                for (int i = reg_match[0].rm_so; i < reg_match[0].rm_eo; i++) {
+//                    printf("%c", *(config.str + i + helper));
+//                }
+//                printf("\n");
+//                helper = helper + reg_match[0].rm_eo;
+//            }
+//        }
+
+
