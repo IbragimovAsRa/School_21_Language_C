@@ -1,14 +1,6 @@
 #include "stdio.h"
-#include "stdlib.h"
 #include "string.h"
 #include "stdbool.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <regex.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <unistd.h>
-#include "string.h"
 
 typedef struct {
     bool b;
@@ -157,7 +149,25 @@ int solver_b(int argc, char **argv, FILE *fp) {
 }
 
 int solver_e(int argc, char **argv, FILE *fp) {
+    int sim;
+    char ch;
+    while (fscanf(fp, "%c", &ch) != EOF) {
+        sim = (int) ch;
+        if (ch == '\n') {
+            printf("$");
+            printf("\n");
+        } else if ((int) ch == 9) {
+            printf("%c", ch);
+            continue;
+        } else if (sim >= 0 && sim < 32 && sim != 10 && sim != 9) {
+            printf("^%c", sim + 64);
+        } else if (sim == 127) {
+            printf("^?");
 
+        } else {
+            printf("%c", ch);
+        }
+    }
     return 0;
 }
 
@@ -175,16 +185,17 @@ int solver_E(int argc, char **argv, FILE *fp) {
 int solver_n(int argc, char **argv, FILE *fp) {
     int i = 1;
     char ch;
+    printf("%6i\t", i);
+    i++;
     while (fscanf(fp, "%c", &ch) != EOF) {
-        if (i == 1) {
+        if (next_row_is_empty(fp) == 2 && ch == '\n') {
+            printf("\n");
+            break;
+        }
+        printf("%c", ch);
+        if (ch == '\n') {
             printf("%6i\t", i);
             i++;
-        } else {
-            printf("%c", ch);
-            if (ch == '\n') {
-                printf("%6i\t", i);
-                i++;
-            }
         }
     }
     return 0;
@@ -220,10 +231,39 @@ int solver_s(int argc, char **argv, FILE *fp) {
 }
 
 int solver_t(int argc, char **argv, FILE *fp) {
+    int sim;
+    char ch;
+    while (fscanf(fp, "%c", &ch) != EOF) {
+        sim = (int) ch;
+        if (ch == '\t') {
+            printf("^I");
+        } else
+        if (ch == '\n') {
+            printf("\n");
+        } else if (ch == 9) {
+            printf("%c", ch);
+            continue;
+        } else if (sim >= 0 && sim < 32 && sim != 10 && sim != 9) {
+            printf("^%c", sim + 64);
+        } else if (sim == 127) {
+            printf("^?");
+
+        } else {
+            printf("%c", ch);
+        }
+    }
     return 0;
 }
 
 int solver_T(int argc, char **argv, FILE *fp) {
+    char ch;
+    while (fscanf(fp, "%c", &ch) != EOF) {
+        if (ch == '\t') {
+            printf("^I");
+        } else {
+            printf("%c", ch);
+        }
+    }
     return 0;
 }
 
