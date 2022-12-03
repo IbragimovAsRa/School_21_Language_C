@@ -7,12 +7,6 @@
 #include "string.h"
 #include "utils/list.h"
 
-
-
-// задачи
-//1) доработать конец файла и начало
-//2) разобраться с работой с памятью
-
 typedef struct {
     bool e;
     bool i;
@@ -26,7 +20,6 @@ typedef struct {
     bool o;
     struct Node *pattern_storage;
 } command_line_options; // structure of options
-
 typedef struct {
     int count_pattern_in_file;
     char *filename;
@@ -36,68 +29,44 @@ typedef struct {
     bool multi_files;
     bool flag_l_helper;
     int flag_n_helper;
+     bool second_flag_n_helper;
     bool flag_c_helper;
     bool flag_v_helper;
+    bool default_helper;
 
 } dispatcher_config;
-
 dispatcher_config init_dispatcher_config(command_line_options options, int count_files);
-
-int find_index_start_files(int argc,
-                           char **argv); // функция для определения индекса аргумента с которого должно начинаться перечисление файлов
+int find_index_start_files(int argc, char **argv); // функция для определения индекса аргумента с которого должно начинаться перечисление файлов
 int str_length(FILE *fp);
-
 bool search_by_pattern(char *str, char *pattern, int cflag);
-
-bool pattern_is_in_file(char *filename, char *pattern);
-
 command_line_options command_line_dispatcher(int argc, char **argv);
-
 bool patterns_finder_in_str(char *str, command_line_options clo, int cflag); // multi -e
-void grep_dispatcher(command_line_options options, struct Node *files_storage_head); // add multi files / multi flags
+dispatcher_config grep_dispatcher(command_line_options options, struct Node *files_storage_head); // add multi files / multi flags
 struct Node *parse_files(int argc, char **argv);
-
 void get_pattern_from_file(char *filename, struct Node **pattern_storage);
-
 void output(dispatcher_config config);
-
 bool str_read(FILE *fp, int length, char *output_str);
-
 bool check_eof(FILE *fp); // вызывать когда на границе строки
-int next_Row_Is_Empt(FILE *f);
 int flag_o_solver(dispatcher_config config);
-
-int empty_line_handler(FILE *fp); // возвращает курсор на начало непустой строки (вызывается когда курсор на \n)
+int free_all(dispatcher_config config,  struct Node *files_storage_head);
 
 int main(int argc, char **argv) {
+
     command_line_options options = command_line_dispatcher(argc, argv);
-    struct Node* files_storage_head = parse_files(argc, argv);
-    grep_dispatcher(options, files_storage_head);
+    struct Node *files_storage_head = parse_files(argc, argv);
+    if (options.e == false && options.f == false) {
+        add_Node(&options.pattern_storage, argv[find_index_start_files(argc, argv) - 1]);
+    }
+    dispatcher_config config = grep_dispatcher(options, files_storage_head);
+    free_all(config, files_storage_head);
     return 0;
 }
 
-int empty_line_handler(FILE *fp) {
-    // возвращает 0 в случае успеха
-    // возвращает 1 в случае если дальше конец файла
-    int result;
-    int flag = 1;
-    int next;
-    while (flag) {
-        next = next_Row_Is_Empt(fp);
-        if (next == 2) {
-            result = 1;
-            flag = 0;
-        } else if (next == 1) {
-            fseek(fp, 1, SEEK_CUR);
-        }
-        if (next == 0) {
-            flag = 0;
-            result = 0;
-        }
-    }
-    return result;
+int free_all(dispatcher_config config,  struct Node *files_storage_head) {
+    destroy(config.options.pattern_storage);
+    destroy(files_storage_head);
+    return 0;
 }
-
 bool str_read(FILE *fp, int length, char *output_str) {
 
     for (int i = 0; i < length - 1; i++) {
@@ -106,7 +75,6 @@ bool str_read(FILE *fp, int length, char *output_str) {
     *(output_str + (length - 1)) = '\n';
     return true;
 }
-
 bool patterns_finder_in_str(char *str, command_line_options options, int cflag) {
     bool result = false;
     for (int i = 0; i < get_size(options.pattern_storage); i++) {
@@ -117,56 +85,84 @@ bool patterns_finder_in_str(char *str, command_line_options options, int cflag) 
     }
     return result;
 }
-
 int find_index_start_files(int argc, char **argv) {
-    int result = 0;
+    int result = 1;
     bool flag = false;
     // 1 -  no flags ( a.out 'test' filename.txt )
     // 2 - is flags but without -e -files ( a.out -i 'test' filename.txt )
     // 3 - with -e or -files
-    if (argv[1][0] != '-') {
+
+
+    // возможные исходы
+
+    // 'test' files/file1.txt 1
+    // -i  'test' files/file1.txt 1
+    // -e 'test' files/file1.txt 1
+    // -i -e 'test' files/file1.txt 1
+    // -ie 'test' files/file1.txt 1
+    // -f files/pat1.txt files/file1.txt 1
+    // -f files/pat1.txt -e 'test' files/file1.txt 1
+    //  -e 'test' -f files/pat1.txt  files/file1.txt
+
+    if (argv[1][0] != '-') { // случай когда флагов нет
         result = 2;
         flag = true;
     }
-    if (flag == false) {
-        int i = 0;
+
+    if (!flag) {
+        int i = 1;
+        bool flag_e;
+        bool flag_f;
+
         while (i < argc) {
-            if (argv[i][0] == '-') {
-                if (strstr(argv[i], "e") != 0 || strstr(argv[i], "files") != 0) {
-                    i++;
-                    result++;
+
+
+            if (argv[i][0] != '-') {
+                if (flag_e || flag_f) {
+                    break;
                 }
                 result++;
+                break;
             }
+            flag_e = false;
+            flag_f = false;
+            if ((argv[i][0] == '-')&& strstr(argv[i], "e") != 0 ){
+                flag_e = true;
+            }
+            if ((argv[i][0] == '-')&& strstr(argv[i], "f") != 0 ){
+                flag_f = true;
+            }
+
+            if (flag_e) {
+                result ++;
+                i++;
+            }
+            if (flag_f) {
+                result ++;
+                i++;
+            }
+            result++;
             i++;
         }
-        result = result + 1;
     }
+
+//    if (flag == false) { // флаги есть
+//        int i = 0;
+//        while (i < argc) {
+//            if (argv[i][0] == '-') {
+//                if (strstr(argv[i], "e") != 0 || strstr(argv[i], "files") != 0) {
+//                    i++;
+//                    result++;
+//                }
+//                result++;
+//            }
+//            i++;
+//        }
+//        result = result + 1;
+//    }
 
     return result;
 }
-
-bool pattern_is_in_file(char *filename, char *pattern) {
-    bool result = false;
-    int str_size;
-    char *str;
-    int cflag = REG_ICASE;
-    FILE *fp = fopen(filename, "r");
-    str_size = str_length(fp);
-    str = (char *) malloc(str_size * sizeof(char));
-    while (fgets(str, str_size + 2, fp) != NULL) {
-        if (search_by_pattern(str, pattern, cflag)) {
-            result = true;
-        }
-        str_size = str_length(fp);
-        free(str);
-        str = (char *) malloc(str_size * sizeof(char));
-    }
-    free(str);
-    fclose(fp);
-    return result;
-}
-
 bool search_by_pattern(char *str, char *pattern, int cflag) {
     bool result = false;
     regex_t regex;
@@ -174,9 +170,9 @@ bool search_by_pattern(char *str, char *pattern, int cflag) {
     if (regexec(&regex, str, 0, NULL, 0) == 0) {
         result = true;
     }
+    regfree(&regex);
     return result;
 }
-
 int str_length(FILE *fp) {
     int length = 0;
     char ch;
@@ -190,7 +186,6 @@ int str_length(FILE *fp) {
     fseek(fp, -1 * length, SEEK_CUR);
     return length;
 }
-
 command_line_options command_line_dispatcher(int argc, char **argv) {
     command_line_options options = {false, false, false, false, false, false, false, false, false, false, NULL};
     int current_arg;
@@ -233,30 +228,22 @@ command_line_options command_line_dispatcher(int argc, char **argv) {
     }
     return options;
 }
-
 void get_pattern_from_file(char *filename, struct Node **pattern_storage) {
     FILE *fp;
     fp = fopen(filename, "r");
-    int str_size = str_length(fp);
-    char *str;
-    str = (char *) malloc(str_size * sizeof(char));
-    while (fgets(str, str_size + 2, fp) != NULL) {
+    char str[100];
+    while (fscanf(fp, "%s", str) != EOF) {
         add_Node(pattern_storage, str);
-        str_size = str_length(fp);
-        free(str);
-        str = (char *) malloc(str_size * sizeof(char));
     }
-    free(str);
     fclose(fp);
 }
-
-void grep_dispatcher(command_line_options options, struct Node *files_storage_head) {
+dispatcher_config grep_dispatcher(command_line_options options, struct Node *files_storage_head) {
     bool flag_eof;
 
     int counter_files = 0;
     int count_files = get_size(files_storage_head);
     dispatcher_config config = init_dispatcher_config(options, count_files);
-
+    config.second_flag_n_helper = true;
     while (counter_files < count_files) {
         flag_eof = false;
         config.count_pattern_in_file = 0;
@@ -275,6 +262,10 @@ void grep_dispatcher(command_line_options options, struct Node *files_storage_he
         int iter = 1;
         int str_size = str_length(fp);
         config.str = (char *) malloc(str_size * sizeof(char));
+        if (config.options.n) {
+            config.second_flag_n_helper = config.options.n;
+        }
+        config.default_helper = true;
         while (!flag_eof) {
 
             str_read(fp, str_size, config.str);
@@ -290,42 +281,27 @@ void grep_dispatcher(command_line_options options, struct Node *files_storage_he
                 config.count_pattern_in_file++;
                 output(config);
             }
-
-
             str_size = str_length(fp);
-
             free(config.str);
             config.str = (char *) calloc(str_size, sizeof(char));
             iter++;
         }
-
-
+        config.default_helper = false;
+        if (config.options.n) {
+            config.second_flag_n_helper = false;
+        }
         if (config.count_pattern_in_file > 0) {
             config.flag_l_helper = true;
         }
         config.flag_c_helper = true;
-        //output(config);
+        output(config);
         config.flag_c_helper = false;
         counter_files++;
         free(config.str);
         fclose(fp);
     }
+    return config;
 }
-
-int next_Row_Is_Empt(FILE *f) {
-    char next;
-    if (fscanf(f, "%c", &next) != EOF) {
-        fseek(f, -1, SEEK_CUR);
-        if (next == '\n') {
-            return 1; //
-        } else {
-            return 0; // строка непустая
-        }
-    } else {
-        return 2; // конец файла
-    }
-}
-
 bool check_eof(FILE *fp) {
     bool result;
     char ch;
@@ -339,7 +315,6 @@ bool check_eof(FILE *fp) {
     }
     return result;
 }
-
 dispatcher_config init_dispatcher_config(command_line_options options, int count_files) {
     dispatcher_config config;
     config.flag_c_helper = false;
@@ -356,7 +331,6 @@ dispatcher_config init_dispatcher_config(command_line_options options, int count
     config.options = options;
     return config;
 }
-
 struct Node *parse_files(int argc, char **argv) {
     struct Node *files_storage_head = NULL;
     int index_start_files;
@@ -366,8 +340,8 @@ struct Node *parse_files(int argc, char **argv) {
     }
     return files_storage_head;
 }
-
 void output(dispatcher_config config) {
+
     if (config.options.c) {
         if (config.flag_c_helper) {
             if (config.multi_files) {
@@ -381,14 +355,18 @@ void output(dispatcher_config config) {
         }
     } else if (config.options.o) {
         flag_o_solver(config);
-    } else { // формирование выходной строки
-        if (config.multi_files && (!config.options.h)) {
-            printf("%s:", config.filename);
+    } else { // формирование выходной строк
+        if(config.default_helper) {
+            if (config.second_flag_n_helper) {
+                if (config.multi_files && (!config.options.h)) {
+                    printf("%s:", config.filename);
+                }
+                if (config.options.n) {
+                    printf("%i:", config.flag_n_helper);
+                }
+                printf("%s", config.str);
+            }
         }
-        if (config.options.n) {
-            printf("%i:", config.flag_n_helper);
-        }
-        printf("%s", config.str);
     }
 }
 int flag_o_solver(dispatcher_config config) {
@@ -420,6 +398,16 @@ int flag_o_solver(dispatcher_config config) {
         reg_match[0].rm_so = so;
         reg_match[0].rm_eo = eo;
         if (flag_match == 1) {
+            if(config.default_helper) {
+                if (config.second_flag_n_helper) {
+                    if (config.multi_files && (!config.options.h)) {
+                        printf("%s:", config.filename);
+                    }
+                    if (config.options.n) {
+                        printf("%i:", config.flag_n_helper);
+                    }
+                }
+            }
             for (int i = reg_match[0].rm_so; i < reg_match[0].rm_eo; i++) {
                 printf("%c", *(config.str + i + helper));
             }
@@ -430,4 +418,3 @@ int flag_o_solver(dispatcher_config config) {
     regfree(&regex);
     return 0;
 }
-
