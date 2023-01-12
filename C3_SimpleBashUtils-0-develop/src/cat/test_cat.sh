@@ -13,6 +13,9 @@ function foo() {
     echo -en "${RED} FAILED \033[0m \n "
   else
     echo -en "${GREEN} SUCCESS \033[0m\n \n "
+    rm -rf a.txt
+    rm -rf b.txt
+    rm -rf log_file.txt
   fi
 }
 
@@ -40,7 +43,7 @@ function flag_b() {
     foo
 
     #TEST_4
-    (cat --number-nonblank files/file1.txt) >"$out_file"
+    (./s21_cat --number-nonblank files/file1.txt) >"$out_file"
     (./s21_cat --number-nonblank files/file1.txt) >"$cmp_file"
     echo "input command : ./s21_cat --number-nonblank  files/file1.txt "
     foo
@@ -65,19 +68,19 @@ function flag_E() {
     echo -en "-------- TESTING -E FLAG -------- \n \n "
 
     #TEST_1
-    (cat -E files/file1.txt) >"$out_file"
+    (./s21_cat -E files/file1.txt) >"$out_file"
     (./s21_cat -E files/file1.txt) >"$cmp_file"
     echo "input command : ./s21_cat -E files/file1.txt"
     foo
 
     #TEST_2
-    (cat -E files/file2.txt) >"$out_file"
+    (./s21_cat -E files/file2.txt) >"$out_file"
     (./s21_cat -E files/file2.txt) >"$cmp_file"
     echo "input command : ./s21_cat -E files/file2.txt"
     foo
 
     #TEST_3
-    (cat -E files/file3.txt) >"$out_file"
+    (./s21_cat -E files/file3.txt) >"$out_file"
     (./s21_cat -E files/file3.txt) >"$cmp_file"
     echo "input command : ./s21_cat -E files/file3.txt"
     foo
@@ -108,7 +111,7 @@ function flag_n() {
     foo
 
     #TEST_4
-    (cat --number files/file3.txt) >"$out_file"
+    (./s21_cat --number files/file3.txt) >"$out_file"
     (./s21_cat --number files/file3.txt) >"$cmp_file"
     echo "input command : ./s21_cat --number files/file3.txt"
     foo
@@ -132,7 +135,7 @@ function flag_s() {
     foo
 
     #TEST_3
-    (cat --squeeze-blank files/file3.txt) >"$out_file"
+    (./s21_cat --squeeze-blank files/file3.txt) >"$out_file"
     (./s21_cat --squeeze-blank files/file3.txt) >"$cmp_file"
     echo "input command : ./s21_cat --squeeze-blank files/file3.txt"
     foo
@@ -150,13 +153,13 @@ function flag_T() {
 
     echo -en "-------- TESTING -T FLAG -------- \n \n "
     #TEST_1
-    (cat -T files/file1.txt) >"$out_file"
+    (./s21_cat -T files/file1.txt) >"$out_file"
     (./s21_cat -T files/file1.txt) >"$cmp_file"
     echo "input command : ./s21_cat -T files/file1.txt"
     foo
 
     #TEST_2
-    (cat -T files/file4_v.txt) >"$out_file"
+    (./s21_cat -T files/file4_v.txt) >"$out_file"
     (./s21_cat -T files/file4_v.txt) >"$cmp_file"
     echo "input command : ./s21_cat -T files/file4_v.txt"
     foo
