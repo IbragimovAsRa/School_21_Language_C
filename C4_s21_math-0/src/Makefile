@@ -1,5 +1,6 @@
 
 
+
 all: clean main
 
 main: s21_math.o main.o
@@ -11,10 +12,3 @@ main.o: main.c
 clean:
 	rm -rf *.o
 	rm -rf main
-
-
-
-
-
-
-

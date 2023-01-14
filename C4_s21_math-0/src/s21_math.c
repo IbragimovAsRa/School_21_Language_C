@@ -16,6 +16,27 @@ long double s21_cos(double x) {
     }
     return cos_x;
 }
+
+
+long double s21_atan(double x) {
+    long double atan_x = 0.0;
+    long double d1;
+    long double d2;
+    long double d3;
+    long double cur;
+
+    for (int n = 1; n < count_row_elem; n++) {
+        d1 = pow_int(-1, n - 1);
+        d2 = 2*n - 1;
+        d3 = pow_int(x, 2*n - 1);
+        cur = (d1/d2) * d3;
+        atan_x += cur;
+    }
+
+    return atan_x;
+}
+
+
 long double s21_asin(double x) {
     long double asin_x = 0.0;
     long double d1;
