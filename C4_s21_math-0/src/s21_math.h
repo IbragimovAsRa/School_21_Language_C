@@ -14,7 +14,7 @@ long double s21_asin(double x);
 long double s21_atan(double x);
 long double s21_exp(double x);
 long double s21_sin(double x);
-
+long double s21_log(double x);
 // __________________________supporting_function_______________________________________________
 int factorial(int x);
 long double pow_int(double base, int exp); // temporary

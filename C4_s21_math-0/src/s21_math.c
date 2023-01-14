@@ -84,6 +84,33 @@ long double s21_sin(double x) {
     return sin_x;
 }
 
+
+long double s21_log(double x) {
+    x = x - 1;
+    long double log_x = 0.0;
+    long double d1;
+    long double d2;
+    long double cur;
+
+    for (int n = 1; n <= count_row_elem; n++) {
+        d1 = pow_int(-1, n + 1);
+        d2 = pow_int(x, n );
+        cur = (d1*d2)/(n );
+        log_x += cur;
+
+
+        printf("iter - %i\n", n);
+        printf("log_x = %Lf\n", log_x);
+        printf("d1 = %Lf\n", d1);
+        printf("d2 = %Lf\n", d2);
+        printf("cur = %Lf\n", cur);
+        printf("_______________________________\n");
+
+
+    }
+    return log_x;
+}
+
 // вспомогательные функции
 
 int factorial(int x) {
@@ -106,8 +133,10 @@ long double pow_int(double base, int exp) {
     if (exp == 0) {
         result = 1.0;
     }
-    if (exp == 1.0) {
+    if (exp == 1) {
         result = tmp;
     }
     return result;
 }
+
+
