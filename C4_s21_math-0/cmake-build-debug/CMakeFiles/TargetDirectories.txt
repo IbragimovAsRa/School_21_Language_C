@@ -1,3 +1,0 @@
-/home/aslan/Desktop/21_school_core/School_21_Core_Program/C4_s21_math-0/cmake-build-debug/CMakeFiles/C4_s21_math_0.dir
-/home/aslan/Desktop/21_school_core/School_21_Core_Program/C4_s21_math-0/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/aslan/Desktop/21_school_core/School_21_Core_Program/C4_s21_math-0/cmake-build-debug/CMakeFiles/rebuild_cache.dir
