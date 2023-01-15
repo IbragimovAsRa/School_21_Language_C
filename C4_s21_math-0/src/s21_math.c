@@ -16,7 +16,15 @@ long double s21_cos(double x) {
     }
     return cos_x;
 }
+long double s21_pow(double x, double exp) {
+    long double result;
 
+    double d1;
+    d1 = (double )(exp*s21_log(x));
+    result = s21_exp(d1);
+    return result;
+
+}
 
 long double s21_atan(double x) {
     long double atan_x = 0.0;
@@ -35,7 +43,11 @@ long double s21_atan(double x) {
 
     return atan_x;
 }
-
+long double s21_sqrt(double x) {
+    long double answer = 0.0;
+    answer = s21_pow(x, 0.5);
+    return answer;
+}
 
 long double s21_asin(double x) {
     long double asin_x = 0.0;
@@ -86,28 +98,27 @@ long double s21_sin(double x) {
 
 
 long double s21_log(double x) {
-    x = x - 1;
+    x = (x-1)/(x+1);
     long double log_x = 0.0;
     long double d1;
     long double d2;
+    int d0;
     long double cur;
 
     for (int n = 1; n <= count_row_elem; n++) {
-        d1 = pow_int(-1, n + 1);
-        d2 = pow_int(x, n );
-        cur = (d1*d2)/(n );
+        d0 = 2*n - 1;
+        d1 = pow_int(x, d0);
+        d2 = 2*n - 1;
+        cur = d1/d2;
         log_x += cur;
-
-
         printf("iter - %i\n", n);
         printf("log_x = %Lf\n", log_x);
         printf("d1 = %Lf\n", d1);
         printf("d2 = %Lf\n", d2);
         printf("cur = %Lf\n", cur);
         printf("_______________________________\n");
-
-
     }
+    log_x = log_x*2;
     return log_x;
 }
 
