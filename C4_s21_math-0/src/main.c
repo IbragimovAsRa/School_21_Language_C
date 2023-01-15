@@ -5,8 +5,8 @@
 int main() {
 
 
-    long double r = s21_sqrt(4);
-    long double o = sqrt(4);
+    long double r = s21_tan(0.5);
+    long double o = tan(0.5);
 
     printf("orig = %Lf\n", o);
     printf("no orig = %Lf\n", r);

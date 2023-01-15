@@ -4,23 +4,43 @@
 
 #include <stdio.h>
 #include <math.h>
-#define count_row_elem 12 // determines the accuracy
-#define count_iter 10
+
+#define count_row_elem 3 // determines the accuracy
 #define PI 3.14159265359
 
 int s21_abs(int x);
-long double s21_cos(double x);
+
 long double s21_acos(double x);
+
 long double s21_asin(double x);
+
 long double s21_atan(double x);
+
+long double s21_ceil(double x);
+
+long double s21_cos(double x);
+
 long double s21_exp(double x);
-long double s21_sin(double x);
+
+long double s21_fabs(double x);
+
+long double s21_floor(double x);
+
+long double s21_fmod(double x, double y);
+
 long double s21_log(double x);
+
+long double s21_pow(double x, double exp);
+
+long double s21_sin(double x);
+
 long double s21_sqrt(double x);
-long double s21_pow(double x, double exp1);
+
+long double s21_tan(double x);
 
 // __________________________supporting_function_______________________________________________
 int factorial(int x);
+
 long double pow_int(double base, int exp); // temporary
 // ________________________________________________________________________________________________
 
