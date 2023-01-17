@@ -1,14 +1,21 @@
+CFLAGS = -Wall -Werror -Wextra
 
 
+all: clean test
 
-all: clean main
-
-main: s21_math.o main.o
-	gcc -o main main.o s21_math.o
 s21_math.o: s21_math.c
-	gcc -c s21_math.c
-main.o: main.c
-	gcc -c main.c
+	gcc $(CFLAGS) -c s21_math.c
+
+test.o: test.c
+	gcc $(CFLAGS) -c test.c
+
+s21_math.a: s21_math.o
+	ar -rcs	libs21_math.a s21_math.o
+
+test: s21_math.a test.o
+	gcc -o test  test.o -lcheck -lm -lpthread -lrt -lsubunit -L. -ls21_math
 clean:
 	rm -rf *.o
 	rm -rf main
+	rm -rf a.out
+	rm -rf *.a
