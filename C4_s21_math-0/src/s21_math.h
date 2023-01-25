@@ -3,9 +3,9 @@
 #define S21_MATH_H_
 
 #include <stdio.h>
-#include <math.h>
+#include <stdbool.h>
 
-#define count_row_elem 3 // determines the accuracy
+#define count_row_elem 110 // determines the accuracy
 #define PI 3.14159265359
 
 int s21_abs(int x);
@@ -30,7 +30,7 @@ long double s21_fmod(double x, double y);
 
 long double s21_log(double x);
 
-long double s21_pow(double x, double exp);
+long double s21_pow(double base, double exp);
 
 long double s21_sin(double x);
 
@@ -39,9 +39,14 @@ long double s21_sqrt(double x);
 long double s21_tan(double x);
 
 // __________________________supporting_function_______________________________________________
-int factorial(int x);
+struct result {
+    long double value;
+    bool flag;
+};
+unsigned long long int factorial(int x);
+struct result s21_pow_bad_input(double base, double exp);
 
-long double pow_int(double base, int exp); // temporary
+long double pow_int(long double base, int exp); // temporary
 // ________________________________________________________________________________________________
 
 #endif //S21_MATH_H_
