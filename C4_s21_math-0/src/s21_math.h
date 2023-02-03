@@ -1,6 +1,6 @@
 
-#ifndef S21_MATH_H_
-#define S21_MATH_H_
+#ifndef SRC_S21_MATH_H_
+#define SRC_S21_MATH_H_
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -49,4 +49,4 @@ struct result s21_pow_bad_input(double base, double exp);
 long double pow_int(long double base, int exp); // temporary
 // ________________________________________________________________________________________________
 
-#endif //S21_MATH_H_
+#endif // SRC_S21_MATH_H_
