@@ -35,6 +35,18 @@ Suite *get_suite_s21_sin();
 
 Suite *get_suite_s21_tan();
 
+Suite *get_suite_s21_abs();
+
+Suite *get_suite_s21_fabs();
+
+Suite *get_suite_s21_floor();
+
+Suite *get_suite_s21_fmod();
+
+
+
+
+
 
 
 #endif // SRC_TEST_CASES_S21_MATH_H_

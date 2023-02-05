@@ -1,7 +1,4 @@
 #include <check.h>
-#include <math.h>
-
-#include "s21_math.h"
 #include "test_cases_s21_math.h"
 
 
@@ -22,9 +19,14 @@ int main(void) {
     array_test_cases[8] = get_suite_s21_cos();
     array_test_cases[9] = get_suite_s21_sin();
     array_test_cases[10] = get_suite_s21_tan();
+    array_test_cases[11] = get_suite_s21_abs();
+    array_test_cases[12] = get_suite_s21_fabs();
+    array_test_cases[13] = get_suite_s21_floor();
+    array_test_cases[14] = get_suite_s21_fmod();
 
 
-    for (int i = 0; i < 11; i ++ ){
+
+    for (int i = 0; i < 15; i ++ ){
         test_func_s21(array_test_cases[i]);
     }
     return 0;

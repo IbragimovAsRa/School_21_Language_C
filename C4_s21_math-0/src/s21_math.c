@@ -1,9 +1,6 @@
 #include "s21_math.h"
-#include <math.h>
 #include <stdbool.h>
-#include "stdlib.h"
 
-// переделать через битовые операции
 int s21_abs(int x) {
     if (x < 0) {
         x = x * (-1);
@@ -12,8 +9,8 @@ int s21_abs(int x) {
 }
 
 long double s21_fabs(double x) {
-    if (x < 0.00000000000001) {
-        x = x * (-1);
+    if (x < 0.0) {
+        x = x * (-1.0);
     }
     return x;
 }
@@ -21,6 +18,17 @@ long double s21_fabs(double x) {
 long double s21_floor(double x) {
     int y = (int) x;
     long double result = y;
+    if (x != x) {
+        result = S21_NAN;
+    } else if (x == S21_INFINITY) {
+        result = S21_INFINITY;
+    } else if (x == -S21_INFINITY) {
+        result = -S21_INFINITY;
+    } else if (result < 0.0) {
+        if ((x - y) != 0.0) {
+            result = result - 1.0;
+        }
+    }
     return result;
 }
 
@@ -78,9 +86,9 @@ long double s21_pow(double base, double exp) {
 long double s21_atan(double x) {
     long double atan_x = 0.0;
     int flag_sign;
-    if (x == INFINITY) {
+    if (x == S21_INFINITY) {
         atan_x = PI / 2;
-    } else if (x == -INFINITY) {
+    } else if (x == -S21_INFINITY) {
         atan_x = -PI / 2;
     } else if (x == 1.0) {    // -1 and 1 - limit values, bad convergence
         atan_x = 0.78539816339744;
@@ -112,12 +120,12 @@ long double s21_atan(double x) {
 long double s21_sqrt(double x) {
     long double answer = 0.0;
     answer = s21_pow(x, 0.5);
-    if (x == INFINITY) {
-        answer = INFINITY;
-    } else if (x == -INFINITY) {
-        answer = NAN;
+    if (x == S21_INFINITY) {
+        answer = S21_INFINITY;
+    } else if (x == -S21_INFINITY) {
+        answer = S21_NAN;
     } else if (x != x) {
-        answer = NAN;
+        answer = S21_NAN;
     }
 
     return answer;
@@ -129,20 +137,20 @@ long double s21_ceil(double x) {
     if (x > 0.0) {
         result += 1.0;
     }
-    if (x == INFINITY) {
-        result = INFINITY;
-    } else if (x == -INFINITY) {
-        result = -INFINITY;
+    if (x == S21_INFINITY) {
+        result = S21_INFINITY;
+    } else if (x == -S21_INFINITY) {
+        result = -S21_INFINITY;
     } else if (x != x) {
-        result = NAN;
+        result = S21_NAN;
     }
     return result;
 }
 
 long double s21_asin(double x) {
     long double asin_x = 0.0;
-    if (x == INFINITY || x == -INFINITY || x != x) {
-        asin_x = NAN;
+    if (x == S21_INFINITY || x == -S21_INFINITY || x != x) {
+        asin_x = S21_NAN;
     } else {
         asin_x = s21_atan((double )(x /s21_sqrt((double )(1.0 - s21_pow(x, 2)))));
     }
@@ -193,10 +201,10 @@ long double s21_log(double x) {
     if ((x < 10e-11) && (x > -10e-11)) { // checking for a zero number
         flag_zero = true;
     }
-    if (x == INFINITY) {
+    if (x == S21_INFINITY) {
         flag_positive_inf = true;
     }
-    if (x == -INFINITY) {
+    if (x == -S21_INFINITY) {
         flag_negative_inf = true;
     }
 
@@ -207,17 +215,33 @@ long double s21_log(double x) {
         }
     }
     if (flag_zero || flag_positive_inf) {
-        log_x = INFINITY;
+        log_x = S21_INFINITY;
     } else if (flag_negative || flag_negative_inf) {
-        log_x = NAN;
+        log_x = S21_NAN;
     }
     return log_x;
 }
 
 long double s21_fmod(double x, double y) {
     long double result = x / y;
-    int tmp = (int) result;
-    result = x - y * tmp;
+    bool flag_nan = false;
+
+    if ((result != result)||result == S21_INFINITY || result == -S21_INFINITY) {
+        result = S21_NAN;
+        flag_nan = true;
+    } else {
+        int tmp = (int) result;
+        result = x - y * tmp;
+    }
+
+    if (s21_fabs(x) < s21_fabs(y)) {
+        result = x;
+    } else if (x == y && x != S21_INFINITY) {
+        result = 0.0;
+        if (flag_nan) {
+            result = S21_NAN;
+        }
+    }
     return result;
 
 }
@@ -227,14 +251,14 @@ long double s21_tan(double x) {
 }
 
 // вспомогательные функции
-unsigned long long int factorial(int N) {
-    if (N < 0) {
+unsigned long long int factorial(int x) {
+    if (x < 0) {
         return 0;
     }
-    if (N == 0) {
+    if (x == 0) {
         return 1;
     } else {
-        return N * factorial(N - 1);
+        return x * factorial(x - 1);
     }
 }
 
@@ -266,37 +290,37 @@ struct result s21_pow_bad_input(double base, double exp) {
     output.flag = false;
     output.value = 0.0;
 
-    if (base == INFINITY || base == -INFINITY) {
+    if (base == S21_INFINITY || base == -S21_INFINITY) {
         output.flag = true;
-        output.value = INFINITY;
+        output.value = S21_INFINITY;
 
-        if (base == INFINITY) {
-            if (exp == INFINITY) {
-                output.value = INFINITY;
+        if (base == S21_INFINITY) {
+            if (exp == S21_INFINITY) {
+                output.value = S21_INFINITY;
             }
-            if (exp == -INFINITY) {
+            if (exp == -S21_INFINITY) {
                 output.value = 0.0;
             }
             if (exp != exp) {
-                output.value = NAN;
+                output.value = S21_NAN;
             }
         }
-        if (base == -INFINITY) {
+        if (base == -S21_INFINITY) {
 
-            if (exp == INFINITY) {
-                output.value = INFINITY;
+            if (exp == S21_INFINITY) {
+                output.value = S21_INFINITY;
             }
-            if (exp == -INFINITY) {
+            if (exp == -S21_INFINITY) {
                 output.value = 0.0;
             }
             if (exp != exp) {
-                output.value = NAN;
+                output.value = S21_NAN;
             }
         }
     }
     if (base != base) {
         output.flag = true;
-        output.value = NAN;
+        output.value = S21_NAN;
     }
     return output;
 }

@@ -4,9 +4,12 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define count_row_elem 13 // determines the accuracy
 #define PI 3.14159265358979323846
+#define S21_INFINITY (1.0 / 0.0)
+#define S21_NAN (0.0/ 0.0)
 
 int s21_abs(int x);
 
@@ -43,7 +46,7 @@ struct result {
     long double value;
     bool flag;
 };
-unsigned long long int factorial(int N);
+unsigned long long int factorial(int x);
 struct result s21_pow_bad_input(double base, double exp);
 
 long double pow_int(long double base, int exp); // temporary
