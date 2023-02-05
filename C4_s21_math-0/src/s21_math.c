@@ -25,9 +25,25 @@ long double s21_floor(double x) {
 }
 
 long double s21_cos(double x) {
-    long double cos_x = 0.0;
-    for (int n = 0; n <= count_row_elem; n++) {
-        cos_x += pow_int(-1, n) * (pow_int(x, 2 * n) / factorial(2 * n));
+    long double cos_x = 1.0;
+    int tmp;
+    int flag_sign;
+    if (x < 0.0) {
+        x = -1 * x;
+    }
+    if (!(x > -2*PI && x < 2*PI) ) {
+        tmp = (int)(x / (2*PI));
+        x = x - tmp * (2*PI);
+    }
+    long double cur = 1;
+    for (int n = 1; n <= 40; n++) {
+        if (n % 2 == 0) {
+            flag_sign = 1;
+        } else {
+            flag_sign = -1;
+        }
+        cur = cur*pow_int(x, 2)/(2*n)/(2*n-1);
+        cos_x += flag_sign*cur;
     }
     return cos_x;
 }
@@ -53,21 +69,42 @@ long double s21_pow(double base, double exp) {
             res = 0.0;
         }
     }
+    if (exp == 0.0) {
+        res = 1;
+    }
     return res;
 }
 
 long double s21_atan(double x) {
     long double atan_x = 0.0;
-    long double d1;
-    long double d2;
-    long double d3;
-    long double cur;
-    for (int n = 1; n < count_row_elem; n++) {
-        d1 = pow_int(-1, n - 1);
-        d2 = 2 * n - 1;
-        d3 = pow_int(x, 2 * n - 1);
-        cur = (d1 / d2) * d3;
-        atan_x += cur;
+    int flag_sign;
+    if (x == INFINITY) {
+        atan_x = PI / 2;
+    } else if (x == -INFINITY) {
+        atan_x = -PI / 2;
+    } else if (x == 1.0) {    // -1 and 1 - limit values, bad convergence
+        atan_x = 0.78539816339744;
+    } else if (x == -1.0) {
+        atan_x = -0.78539816339744;
+    } else if (x > -1.0 && x < 1.0) {
+        for (int n = 0; n < 1000; n++) {
+            if (n % 2 == 0) {
+                flag_sign = 1;
+            } else {
+                flag_sign = -1;
+            }
+            atan_x += flag_sign* s21_pow(x, 1 + (2 * n)) / (1 + (2 * n));
+        }
+    } else {
+        for (int n = 0; n < 1000; n++) {
+            if (n % 2 == 0) {
+                flag_sign = 1;
+            } else {
+                flag_sign = -1;
+            }
+            atan_x += flag_sign * s21_pow(x, -1 - (2 * n)) / (1 + (2 * n));
+        }
+        atan_x = PI * s21_sqrt(x * x) / (2 * x) - atan_x;
     }
     return atan_x;
 }
@@ -87,7 +124,7 @@ long double s21_sqrt(double x) {
 }
 
 long double s21_ceil(double x) {
-     int y = ( int) x;
+    int y = (int) x;
     long double result = y;
     if (x > 0.0) {
         result += 1.0;
@@ -104,20 +141,10 @@ long double s21_ceil(double x) {
 
 long double s21_asin(double x) {
     long double asin_x = 0.0;
-    long double d1;
-    long double d2;
-    long double d3;
-    int d4;
-    long double d5;
-    long double cur;
-    for (int n = 0; n < count_row_elem; n++) {
-        d1 = factorial(2 * n);
-        d2 = pow_int(4, n);
-        d3 = pow_int(factorial(n), 2) * (2 * n + 1);
-        d4 = (2 * n + 1);
-        d5 = pow_int(x, d4);
-        cur = (d1 / (d2 * d3)) * d5;
-        asin_x += cur;
+    if (x == INFINITY || x == -INFINITY || x != x) {
+        asin_x = NAN;
+    } else {
+        asin_x = s21_atan((double )(x /s21_sqrt((double )(1.0 - s21_pow(x, 2)))));
     }
     return asin_x;
 }
@@ -147,20 +174,7 @@ long double s21_acos(double x) {
 }
 
 long double s21_sin(double x) {
-    long double sin_x = 0;
-    long double d1;
-    long double d2;
-    long double d3;
-    long double cur;
-
-    for (int n = 1; n <= count_row_elem; n++) {
-        d1 = pow_int(-1, n - 1);
-        d2 = pow_int(x, 2 * n - 1);
-        d3 = factorial(2 * n - 1);
-        cur = d1 * (d2 / d3);
-        sin_x += cur;
-    }
-    return sin_x;
+    return s21_cos(PI/2 - x);
 }
 
 long double s21_log(double x) {
@@ -234,14 +248,15 @@ long double s21_tan(double x) {
 }
 
 // вспомогательные функции
-unsigned long long int factorial(int x) {
-    unsigned long long int result = 1;
-    unsigned long long int tmp = x;
-    for (int i = 0; i < x; i++) {
-        result = result * tmp;
-        tmp--;
+unsigned long long int factorial(int N) {
+    if (N < 0) {
+        return 0;
     }
-    return result;
+    if (N == 0) {
+        return 1;
+    } else {
+        return N * factorial(N - 1);
+    }
 }
 
 long double pow_int(long double base, int exp) {
@@ -256,7 +271,7 @@ long double pow_int(long double base, int exp) {
         result = 1.0;
     }
     if (exp < 0) {
-        result = 1.0/result;
+        result = 1.0 / result;
     }
     if (exp == 1) {
         result = tmp;

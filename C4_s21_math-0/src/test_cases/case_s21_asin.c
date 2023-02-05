@@ -62,7 +62,7 @@ START_TEST(asin_test_15) {
 END_TEST
 
 START_TEST(asin_test_16) {
-    ck_assert_ldouble_eq_tol(s21_asin(12345), asin(12345),1e-6);}
+    ck_assert_ldouble_nan(s21_asin(12345));}
 END_TEST
 
 

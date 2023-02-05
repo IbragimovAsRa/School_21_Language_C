@@ -27,4 +27,11 @@ Suite *get_suite_s21_pow();
 
 Suite *get_suite_s21_sqrt();
 
+Suite *get_suite_s21_atan();
+
+Suite *get_suite_s21_cos();
+
+Suite *get_suite_s21_sin();
+
+
 #endif // SRC_TEST_CASES_S21_MATH_H_

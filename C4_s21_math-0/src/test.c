@@ -16,14 +16,16 @@ int main(void) {
     array_test_cases[2] = get_suite_s21_log();
     array_test_cases[3] = get_suite_s21_pow();
     array_test_cases[4] = get_suite_s21_sqrt();
-    array_test_cases[5] = get_suite_s21_asin();
-    array_test_cases[6] = get_suite_s21_acos();
+    array_test_cases[5] = get_suite_s21_atan();
+    array_test_cases[6] = get_suite_s21_asin();
+    array_test_cases[7] = get_suite_s21_acos();
+    array_test_cases[8] = get_suite_s21_cos();
+    array_test_cases[9] = get_suite_s21_sin();
 
 
-    for (int i = 0; i < 7; i ++ ){
+    for (int i = 0; i < 10; i ++ ){
         test_func_s21(array_test_cases[i]);
     }
-
     return 0;
 }
 
