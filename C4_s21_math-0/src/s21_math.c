@@ -223,28 +223,7 @@ long double s21_fmod(double x, double y) {
 }
 
 long double s21_tan(double x) {
-    long double bernuli[] = {1.0,
-                             -1.0 / 2.0,
-                             1.0 / 6.0,
-                             0.0,
-                             -1.0 / 30.0,
-                             0.0,
-                             1.0 / 42.0};
-    long double tan_x = 0.0;
-    long double d1;
-    long double d2;
-    long double d3;
-    long double d4;
-    long double cur;
-    for (int n = 1; n < count_row_elem; n++) {
-        d1 = pow_int(-4, n);
-        d2 = 1 - pow_int(4, n);
-        d3 = factorial(2 * n);
-        d4 = pow_int(x, 2 * n - 1);
-        cur = ((bernuli[2 * n] * d1 * d2) / d3) * d4;
-        tan_x += cur;
-    }
-    return tan_x;
+    return s21_sin(x)/s21_cos(x);
 }
 
 // вспомогательные функции

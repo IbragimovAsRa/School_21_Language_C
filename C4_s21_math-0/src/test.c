@@ -21,9 +21,10 @@ int main(void) {
     array_test_cases[7] = get_suite_s21_acos();
     array_test_cases[8] = get_suite_s21_cos();
     array_test_cases[9] = get_suite_s21_sin();
+    array_test_cases[10] = get_suite_s21_tan();
 
 
-    for (int i = 0; i < 10; i ++ ){
+    for (int i = 0; i < 11; i ++ ){
         test_func_s21(array_test_cases[i]);
     }
     return 0;

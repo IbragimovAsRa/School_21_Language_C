@@ -33,5 +33,8 @@ Suite *get_suite_s21_cos();
 
 Suite *get_suite_s21_sin();
 
+Suite *get_suite_s21_tan();
+
+
 
 #endif // SRC_TEST_CASES_S21_MATH_H_
