@@ -2,14 +2,15 @@
 #ifndef SRC_S21_MATH_H_
 #define SRC_S21_MATH_H_
 
-#include <stdio.h>
+
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-#define count_row_elem 13 // determines the accuracy
+#define count_row_elem 13  // determines the accuracy
 #define PI 3.14159265358979323846
 #define S21_INFINITY (1.0 / 0.0)
-#define S21_NAN (0.0/ 0.0)
+#define S21_NAN (0.0 / 0.0)
 
 int s21_abs(int x);
 
@@ -43,13 +44,13 @@ long double s21_tan(double x);
 
 // __________________________supporting_function_______________________________________________
 struct result {
-    long double value;
-    bool flag;
+  long double value;
+
+  bool flag;
 };
-unsigned long long int factorial(int x);
 struct result s21_pow_bad_input(double base, double exp);
 
-long double pow_int(long double base, int exp); // temporary
+long double s21_pow_int(long double base, int exp);  // temporary
 // ________________________________________________________________________________________________
 
-#endif // SRC_S21_MATH_H_
+#endif  // SRC_S21_MATH_H_

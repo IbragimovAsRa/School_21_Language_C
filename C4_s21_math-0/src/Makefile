@@ -1,34 +1,47 @@
 CFLAGS = -Wall -Werror -Wextra
 TST_LIBS = -lcheck -lm -lpthread -lrt -lsubunit
 
-all: clean test
 
-s21_math.o: s21_math.c
-	gcc $(CFLAGS)  -c $(GCOVFL) s21_math.c
+TARGET_1=tests.out
 
-test.o: test.c
-	gcc $(CFLAGS) -c $(GCOVFL) test.c
+CC=gcc
+STD_FLAGS=-Wall -Wextra -Werror -std=c11
+COV_FLAGS=--coverage -lgcov
+TEST_FLAGS=-lcheck -lrt -lpthread -lsubunit -lm
+SOURCES_0 = s21_*.o
+SOURCES_1 = math_func/s21_*.c
+SOURCES_2 = s21_math_tests.c
+SOURCES_3 = s21_math.a
+
+
+all: clean s21_math.a test run gcov_report
+
+s21_math_tests.o: s21_math_tests.c
+	gcc $(STD_FLAGS) -c  s21_math_tests.c
 
 test_case:
-	gcc $(CFLAGS) -c test_cases/*.c
+	gcc $(STD_FLAGS) -c test_cases/*.c
 
-s21_math.a: s21_math.o
-	ar -rcs	libs21_math.a s21_math.o
+s21_math.a:
+	$(CC) $(STD_FLAGS) -c $(SOURCES_1)  $(COV_FLAGS)
+	ar rcs s21_math.a  $(SOURCES_0)
 
-test: s21_math.a test.o test_case
-	gcc -o test  *.o $(TST_LIBS) -L. -ls21_math
+test: s21_math.a s21_math_tests.o test_case
+	$(CC) -o $(TARGET_1) $(STD_FLAGS)  *.o  -L. -l:$(SOURCES_3) $(COV_FLAGS) $(TEST_FLAGS)
 
-coverage:
-	gcov s21_math.c
+gcov_report:
+	gcovr -r . --html --html-details -o coverage_report.html
 
-gcovr-report: coverage ## Generate gcovr report
-	gcovr --root . --html --html-details --output gcovr-report/coverage.html
-run: clean test
-	./test
-gcov_report: test
+run: test
+	./tests.out
+
+
+style_check: style_correct
+	clang-format -style=google -n *.c *.h test_cases/*.c
+style_correct:
+	clang-format -style=google -i *.c *.h test_cases/*.c
 clean:
 	rm -rf *.o
-	rm -rf main
-	rm -rf a.out
 	rm -rf *.a
-	rm -rf test
+	rm -rf *.html *.gcno *.gcda *.o *.out *.css *coverage* *.a
+
