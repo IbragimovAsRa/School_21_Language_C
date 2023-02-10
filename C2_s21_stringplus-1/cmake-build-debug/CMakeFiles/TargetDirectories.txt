@@ -1,0 +1,3 @@
+/home/aslan/Desktop/21_school_core/School_21_Core_Program/C2_s21_stringplus-1/cmake-build-debug/CMakeFiles/C2_s21_stringplus_1.dir
+/home/aslan/Desktop/21_school_core/School_21_Core_Program/C2_s21_stringplus-1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/aslan/Desktop/21_school_core/School_21_Core_Program/C2_s21_stringplus-1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
