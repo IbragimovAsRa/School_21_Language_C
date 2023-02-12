@@ -1,5 +1,6 @@
 #include "../s21_string_tests.h"
-#include "stdio.h"
+
+
 
 START_TEST(memchr_test_1) {
     char *test_str_1 = "hello world";
@@ -18,7 +19,7 @@ END_TEST
 
 
 
-Suite *get_suite_s21_memchr() {
+Suite *get_suite_s21_strcat() {
     Suite *s = suite_create("s21_memchr suite ");
     TCase *tc = tcase_create("s21_memchr test case");
     suite_add_tcase(s, tc);

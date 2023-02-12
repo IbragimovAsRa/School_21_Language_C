@@ -6,7 +6,6 @@ int main() {
 
 
 
-    s = memchr(str, (int)'2', sizeof(str));
 
     return 0;
 }

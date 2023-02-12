@@ -8,6 +8,8 @@
 
 Suite *get_suite_s21_memchr();
 Suite *get_suite_s21_memcmp();
+Suite *get_suite_s21_memmove();
+
 
 
 #endif  // SRC_S21_STRING_TESTS_H_
