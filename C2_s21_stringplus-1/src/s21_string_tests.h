@@ -3,13 +3,14 @@
 
 #include <check.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "s21_string.h"
 
 Suite *get_suite_s21_memchr();
 Suite *get_suite_s21_memcmp();
 Suite *get_suite_s21_memmove();
-
+Suite *get_suite_s21_sscanf();
 
 
 #endif  // SRC_S21_STRING_TESTS_H_
