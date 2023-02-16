@@ -2,14 +2,21 @@
 #include "../s21_string.h"
 #include <string.h>
 
-// символ с - пример - sscanf("ab")
+
 int get_length_pattern(const char *str);
 void filling_with_zeros(char *array, int array_size);
 bool check_separator(const char *ch);
 void carriage_leveler(const char **str);
 char check_specifier(const char *sym_form_current);
 void specifier_c_handler(const char **sym_form_current, const char **sym_str_current, bool separator_form, char *tmp_c);
-void specifier_d_handler();
+void specifier_i_handler(const char **sym_form_current, const char **sym_str_current);
+void specifier_e_handler(const char **sym_form_current, const char **sym_str_current);
+void specifier_E_handler(const char **sym_form_current, const char **sym_str_current);
+void specifier_f_handler(const char **sym_form_current, const char **sym_str_current);
+void specifier_g_handler(const char **sym_form_current, const char **sym_str_current);
+void specifier_G_handler(const char **sym_form_current, const char **sym_str_current);
+void specifier_o_handler(const char **sym_form_current, const char **sym_str_current);
+
 
 
 int s21_sscanf(const char *str, const char *format, ...) {
@@ -60,10 +67,8 @@ int s21_sscanf(const char *str, const char *format, ...) {
                     filling_with_zeros(tmp_str, 100);
                 }
                 break;
+
         }
-
-
-
         sym_form_current++;
         sym_str_current++;
 
@@ -93,15 +98,11 @@ char check_specifier(const char *sym_form_current) {
     return specifier;
 }
 
-
-
 void carriage_leveler(const char **str) {
     while (**str == ' ') {
         *str = *str + 1;
     }
 }
-
-
 
 bool check_separator(const char *ch) {
     bool result = false;

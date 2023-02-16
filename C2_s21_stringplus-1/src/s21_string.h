@@ -31,6 +31,11 @@ char *s21_strchr(const char *str, int c);
 int s21_sscanf(const char *str, const char *format, ...);
 
 
+char *s21_strpbrk(const char *str1, const char *str2);
+
+s21_size_t s21_strspn(const char *str1, const char *str2);
+
+
 // ------------------------------------------------------------------------
 // additional functions
 

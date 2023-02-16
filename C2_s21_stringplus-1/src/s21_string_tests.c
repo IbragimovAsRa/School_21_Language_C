@@ -5,16 +5,17 @@
 void test_func_s21(Suite *s);
 
 int main(void) {
-//    Suite *array_test_cases[20];
-//
-//    array_test_cases[0] = get_suite_s21_memchr();
-//    array_test_cases[1] = get_suite_s21_memcmp();
-//    array_test_cases[2] = get_suite_s21_memmove();
-//
-//
-//    for (int i = 0; i < 3; i++) {
-//        test_func_s21(array_test_cases[i]);
-//    }
+    Suite *array_test_cases[20];
+
+    array_test_cases[0] = get_suite_s21_memchr();
+    array_test_cases[1] = get_suite_s21_memcmp();
+    array_test_cases[2] = get_suite_s21_memmove();
+    array_test_cases[4] = get_suite_s21_strpbrk();
+    array_test_cases[5] = get_suite_s21_strspn();
+
+    for (int i = 0; i < 5; i++) {
+        test_func_s21(array_test_cases[i]);
+    }
 
     printf("START TEST sscanf\n");
     Suite *scan_test_cases[20];
