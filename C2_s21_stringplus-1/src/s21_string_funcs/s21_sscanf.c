@@ -19,13 +19,14 @@ char check_specifier(const char *sym_form_current);
 int specifier_c_handler(const char **sym_form_current, const char **sym_str_current, bool separator_form, char *tmp_c);
 
 int
-specifier_integer_handler(const char **sym_form_current, const char **sym_str_current, int *tmp_d,
+specifier_d_and_i_handler(const char **sym_form_current, const char **sym_str_current, int *tmp_d,
                           char specifier);
 
 int specifier_float_handler(const char **sym_form_current, const char **sym_str_current, float *tmp_fl);
 
 
-int specifier_o_handler(const char **sym_form_current, const char **sym_str_current, unsigned int *tmp_uni);
+int specifier_o_u_x_handler(const char **sym_form_current, const char **sym_str_current, unsigned int *tmp_uni,
+                              char specifier);
 
 int
 specifier_s_handler(const char **sym_form_current, const char **sym_str_current, char *tmp_str);
@@ -35,6 +36,8 @@ int separator_controller(const char **sym_form_current, const char **sym_str_cur
                          bool *separator_str);
 
 void error_handler(int return_code, bool *flag_stop, int *counter);
+
+// int dispatcher_specifier(va_list *factor, );
 
 int s21_sscanf(const char *str, const char *format, ...) {
     bool separator_form = false;
@@ -55,28 +58,34 @@ int s21_sscanf(const char *str, const char *format, ...) {
                                                   va_arg(factor, char*));
                 break;
             case 'd':
-                return_code = specifier_i_and_d_handler(&sym_form_current, &sym_str_current, va_arg(factor, int*), 'd');
+                return_code = specifier_d_and_i_handler(&sym_form_current, &sym_str_current, va_arg(factor, int*), 'd');
                 break;
             case 'i':
-                return_code = specifier_i_and_d_handler(&sym_form_current, &sym_str_current, va_arg(factor, int*), 'i');
+                return_code = specifier_d_and_i_handler(&sym_form_current, &sym_str_current, va_arg(factor, int*), 'i');
                 break;
             case 'e':
                 return_code = specifier_float_handler(&sym_form_current, &sym_str_current, va_arg(factor, float *));
                 break;
             case 'o':
-                return_code = specifier_o_handler(&sym_form_current, &sym_str_current, va_arg(factor, unsigned int *));
+                return_code = specifier_o_u_x_handler(&sym_form_current, &sym_str_current,
+                                                        va_arg(factor, unsigned int *), 'o');
                 break;
             case 's':
                 return_code = specifier_s_handler(&sym_form_current, &sym_str_current,
                                                   va_arg(factor, char *));
                 break;
+            case 'u':
+                return_code = specifier_o_u_x_handler(&sym_form_current, &sym_str_current,
+                                                        va_arg(factor, unsigned int *), 'u');
+                break;
+            case 'x':
+                return_code = specifier_o_u_x_handler(&sym_form_current, &sym_str_current,
+                                                      va_arg(factor, unsigned int *), 'x');
+                break;
         }
         sym_form_current++;
         sym_str_current++;
-        separator_controller(&sym_form_current, &sym_str_current, &separator_form, &separator_str);
-
         error_handler(return_code, &flag_stop, &counter);
-
     }
     va_end(factor);
     return counter;
@@ -97,12 +106,7 @@ void error_handler(int return_code, bool *flag_stop, int *counter) {
 int
 specifier_s_handler(const char **sym_form_current, const char **sym_str_current, char *tmp_str) {
     int i = 0;
-
-  //  if (separator_form) { // переместить курсор строки до первого символа не пробел
-       // carriage_leveler(sym_str_current);
-    //}
     *sym_form_current = *sym_form_current + 1;
-
     while (**sym_str_current != '\0' && **sym_str_current != ' ') {
         *(tmp_str + i) = **(sym_str_current);
         *sym_str_current = *sym_str_current + 1;
@@ -110,7 +114,6 @@ specifier_s_handler(const char **sym_form_current, const char **sym_str_current,
     }
     if (i > 0) {
         *(tmp_str + (i + 1)) = '\0';
-
     }
     return 0;
 }
@@ -133,17 +136,18 @@ int separator_controller(const char **sym_form_current, const char **sym_str_cur
     return 0;
 }
 
-/*
- * void carriage_leveler(const char **str) {
-    while (**str == ' ') {
-        *str = *str + 1;
-    }
-}
- */
-int specifier_o_handler(const char **sym_form_current, const char **sym_str_current, unsigned int *tmp_uni) {
+int specifier_o_u_x_handler(const char **sym_form_current, const char **sym_str_current, unsigned int *tmp_uni,
+                              char specifier) {
     char *end;
-    int base = 8;
+    int base = 0;
 
+    if (specifier == 'o') {
+        base = 8;
+    } else if (specifier == 'u') {
+        base = 10;
+    } else if (specifier == 'x') {
+        base = 16;
+    }
     carriage_leveler(sym_str_current);
     *sym_form_current = (*sym_form_current + 1);
 
@@ -166,7 +170,7 @@ int specifier_float_handler(const char **sym_form_current, const char **sym_str_
     return 0;
 }
 
-int specifier_i_and_d_handler(const char **sym_form_current, const char **sym_str_current, int *tmp_d,
+int specifier_d_and_i_handler(const char **sym_form_current, const char **sym_str_current, int *tmp_d,
                               char specifier) {
     char *end;
     int base;
@@ -212,6 +216,10 @@ char check_specifier(const char *sym_form_current) { // handler specifier
             specifier = 'e';
         } else if (ch == 's') {
             specifier = 's';
+        } else if (ch == 'u') {
+            specifier = 'u';
+        } else if (ch == 'x') {
+            specifier = 'x';
         }
     }
 
