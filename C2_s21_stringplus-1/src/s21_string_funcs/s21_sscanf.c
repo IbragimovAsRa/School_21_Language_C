@@ -1,83 +1,193 @@
 
 #include "../s21_string.h"
-#include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 
 int get_length_pattern(const char *str);
+
 void filling_with_zeros(char *array, int array_size);
+
 bool check_separator(const char *ch);
+
 void carriage_leveler(const char **str);
+
 char check_specifier(const char *sym_form_current);
-void specifier_c_handler(const char **sym_form_current, const char **sym_str_current, bool separator_form, char *tmp_c);
-void specifier_i_handler(const char **sym_form_current, const char **sym_str_current);
-void specifier_e_handler(const char **sym_form_current, const char **sym_str_current);
-void specifier_E_handler(const char **sym_form_current, const char **sym_str_current);
-void specifier_f_handler(const char **sym_form_current, const char **sym_str_current);
-void specifier_g_handler(const char **sym_form_current, const char **sym_str_current);
-void specifier_G_handler(const char **sym_form_current, const char **sym_str_current);
-void specifier_o_handler(const char **sym_form_current, const char **sym_str_current);
+
+// функции возвращают 0 в случае успешного считывания и записи в противном случае 1 (спецификатор не считан/не записан)
+
+int specifier_c_handler(const char **sym_form_current, const char **sym_str_current, bool separator_form, char *tmp_c);
+
+int
+specifier_integer_handler(const char **sym_form_current, const char **sym_str_current, int *tmp_d,
+                          char specifier);
+
+int specifier_float_handler(const char **sym_form_current, const char **sym_str_current, float *tmp_fl);
 
 
+int specifier_o_handler(const char **sym_form_current, const char **sym_str_current, unsigned int *tmp_uni);
+
+int
+specifier_s_handler(const char **sym_form_current, const char **sym_str_current, char *tmp_str);
+
+
+int separator_controller(const char **sym_form_current, const char **sym_str_current, bool *separator_form,
+                         bool *separator_str);
+
+void error_handler(int return_code, bool *flag_stop, int *counter);
 
 int s21_sscanf(const char *str, const char *format, ...) {
-    va_list factor;
     bool separator_form = false;
     bool separator_str = false;
-
-    va_start(factor, format);
     const char *sym_form_current = format;
     const char *sym_str_current = str;
-    char *tmp_c;
-    int *tmp_d;
-    char tmp_str[100];
-    int length_pattern;
-    filling_with_zeros(tmp_str, 100);
+    va_list factor;
+    va_start(factor, format);
+    int counter = 0;
+    bool flag_stop = false;
+    int return_code = 0;
 
-    //int read_char = 0;
-
-    while (*sym_form_current != '\0' && *sym_str_current != '\0') { // brute force of format characters
-
-        separator_form = check_separator(sym_form_current);
-        separator_str = check_separator(sym_str_current);
-
-        if (separator_form && separator_str) { // выровнять каретки
-            carriage_leveler(&sym_str_current);
-            carriage_leveler(&sym_form_current);
-        }
-
+    while (*sym_form_current != '\0' && *sym_str_current != '\0' && !flag_stop) { // brute force of format characters
+        separator_controller(&sym_form_current, &sym_str_current, &separator_form, &separator_str);
         switch (check_specifier(sym_form_current)) {
             case 'c':
-                tmp_c = va_arg(factor, char*);
-                specifier_c_handler(&sym_form_current, &sym_str_current, separator_form, tmp_c);
+                return_code = specifier_c_handler(&sym_form_current, &sym_str_current, separator_form,
+                                                  va_arg(factor, char*));
                 break;
             case 'd':
-                carriage_leveler(&sym_str_current);
-                sym_form_current = (sym_form_current + 1);
-                tmp_d = va_arg(factor, int*);
-                if (separator_form) { // переместить курсор строки до первого символа не пробел
-                    while (*sym_str_current == ' ' ) {
-                        sym_str_current += 1;
-                    }
-                }
-                if (*sym_str_current != '\0') {
-                    length_pattern = get_length_pattern(sym_str_current);
-                    strncpy(tmp_str, sym_str_current, length_pattern);
-                    *tmp_d = atoi(tmp_str); // обработать на ошибки
-                    sym_str_current = sym_str_current + length_pattern;
-                    filling_with_zeros(tmp_str, 100);
-                }
+                return_code = specifier_i_and_d_handler(&sym_form_current, &sym_str_current, va_arg(factor, int*), 'd');
                 break;
-
+            case 'i':
+                return_code = specifier_i_and_d_handler(&sym_form_current, &sym_str_current, va_arg(factor, int*), 'i');
+                break;
+            case 'e':
+                return_code = specifier_float_handler(&sym_form_current, &sym_str_current, va_arg(factor, float *));
+                break;
+            case 'o':
+                return_code = specifier_o_handler(&sym_form_current, &sym_str_current, va_arg(factor, unsigned int *));
+                break;
+            case 's':
+                return_code = specifier_s_handler(&sym_form_current, &sym_str_current,
+                                                  va_arg(factor, char *));
+                break;
         }
         sym_form_current++;
         sym_str_current++;
+        separator_controller(&sym_form_current, &sym_str_current, &separator_form, &separator_str);
+
+        error_handler(return_code, &flag_stop, &counter);
 
     }
     va_end(factor);
+    return counter;
+}
+
+
+void error_handler(int return_code, bool *flag_stop, int *counter) {
+    if (!(*flag_stop)) {
+        if (return_code == 1) {
+            *flag_stop = true;
+        } else if (return_code == 0) {
+            *counter = *counter + 1;
+        }
+    }
+}
+
+
+int
+specifier_s_handler(const char **sym_form_current, const char **sym_str_current, char *tmp_str) {
+    int i = 0;
+
+  //  if (separator_form) { // переместить курсор строки до первого символа не пробел
+       // carriage_leveler(sym_str_current);
+    //}
+    *sym_form_current = *sym_form_current + 1;
+
+    while (**sym_str_current != '\0' && **sym_str_current != ' ') {
+        *(tmp_str + i) = **(sym_str_current);
+        *sym_str_current = *sym_str_current + 1;
+        i++;
+    }
+    if (i > 0) {
+        *(tmp_str + (i + 1)) = '\0';
+
+    }
     return 0;
 }
 
-void specifier_c_handler(const char **sym_form_current, const char **sym_str_current, bool separator_form, char *tmp_c) {
+
+int separator_controller(const char **sym_form_current, const char **sym_str_current, bool *separator_form,
+                         bool *separator_str) {
+    *separator_form = check_separator(*sym_form_current);
+    *separator_str = check_separator(*sym_str_current);
+    if (check_specifier(*sym_form_current) == 'c') {
+        if (*separator_form && *separator_str) { // выровнять каретки
+            carriage_leveler(sym_str_current);
+            carriage_leveler(sym_form_current);
+        }
+    } else {
+        carriage_leveler(sym_str_current);
+        carriage_leveler(sym_form_current);
+    }
+
+    return 0;
+}
+
+/*
+ * void carriage_leveler(const char **str) {
+    while (**str == ' ') {
+        *str = *str + 1;
+    }
+}
+ */
+int specifier_o_handler(const char **sym_form_current, const char **sym_str_current, unsigned int *tmp_uni) {
+    char *end;
+    int base = 8;
+
+    carriage_leveler(sym_str_current);
+    *sym_form_current = (*sym_form_current + 1);
+
+    if (**sym_str_current != '\0') {
+        *tmp_uni = (unsigned int) strtoul(*sym_str_current, &end, base);
+        *sym_str_current = end;
+    }
+    return 0;
+}
+
+int specifier_float_handler(const char **sym_form_current, const char **sym_str_current, float *tmp_fl) {
+    char *end;
+    carriage_leveler(sym_str_current);
+    *sym_form_current = (*sym_form_current + 1);
+
+    if (**sym_str_current != '\0') {
+        *tmp_fl = (float) strtof(*sym_str_current, &end);
+        *sym_str_current = end;
+    }
+    return 0;
+}
+
+int specifier_i_and_d_handler(const char **sym_form_current, const char **sym_str_current, int *tmp_d,
+                              char specifier) {
+    char *end;
+    int base;
+    if (specifier == 'd') {
+        base = 10;
+    } else {
+        base = 0;
+    }
+    carriage_leveler(sym_str_current);
+    *sym_form_current = (*sym_form_current + 1);
+
+    if (**sym_str_current != '\0') {
+        *tmp_d = (int) strtol(*sym_str_current, &end, base);
+        *sym_str_current = end;
+    }
+    return 0;
+}
+
+
+int
+specifier_c_handler(const char **sym_form_current, const char **sym_str_current, bool separator_form, char *tmp_c) {
     *sym_form_current = (*sym_form_current + 1);
     if (separator_form) { // переместить курсор строки до первого символа не пробел
         carriage_leveler(sym_str_current);
@@ -85,16 +195,26 @@ void specifier_c_handler(const char **sym_form_current, const char **sym_str_cur
     if (**sym_str_current != '\0') {
         *tmp_c = **sym_str_current;
     }
+    return 0;
 }
 
-char check_specifier(const char *sym_form_current) {
+char check_specifier(const char *sym_form_current) { // handler specifier
     char specifier = '!';
-    if (*sym_form_current == '%' && *(sym_form_current + 1) == 'c') {
-        specifier = 'c';
+    char ch = *(sym_form_current + 1);
+    if (*sym_form_current == '%') {
+        if (ch == 'c') {
+            specifier = 'c';
+        } else if (ch == 'd') {
+            specifier = 'd';
+        } else if (ch == 'i') {
+            specifier = 'i';
+        } else if (ch == 'e' || ch == 'E' || ch == 'f' || ch == 'g' || ch == 'G') {
+            specifier = 'e';
+        } else if (ch == 's') {
+            specifier = 's';
+        }
     }
-    if (*sym_form_current == '%' && *(sym_form_current + 1) == 'd') {
-        specifier = 'd';
-    }
+
     return specifier;
 }
 
@@ -114,28 +234,32 @@ bool check_separator(const char *ch) {
 
 int get_length_pattern(const char *str) {
     int count = 0;
-    while (!(*str ==  '\0'  ||  *str == ' ')) {
+    while (!(*str == '\0' || *str == ' ')) {
         str++;
         count++;
     }
     return count;
 }
+
 void filling_with_zeros(char *array, int array_size) {
     for (int i = 0; i < array_size; i++) {
         array[i] = '\0';
     }
 }
 
-// ФЛАГ %C (возможные исходы)
-// 1) sscanf("ab", "%c%c", &ch_1, &ch_2) - классический случай
-// 2) sscanf("a b", "%c%c", &ch_1, &ch_2) - нюансы с пробелами
-// 3) sscanf("a b", "     %c %c", &ch_1, &ch_2) - нюансы с пробелами
 
+/*
+ ______Documentation_______
+ 1) flag_stop
+    = true
+ then stop program
+    = false
+ then continue execution program
 
-// ФЛАГ %D (возможные исходы)
-// 1) sscanf("mu number 1222223", "my number %d", &in_1) - классический случай
-// 2) sscanf("1222223", "%d", &ch_1, &ch_2) - классический случай
-
-
-// Документация (sscanf)
-// все строится на разделителях
+ 2) return_code
+    = 1
+    error
+    = 0
+    success
+ __________________________
+ */

@@ -16,14 +16,13 @@ SOURCES_4 = s21_string_funcs/utils/s21_*.c
 all: clean s21_string.a test run gcov_report
 
 s21_string_tests.o: s21_string_tests.c
-	$(COMPILER) $(STD_FLAGS) -c  s21_string_tests.c
+	$(COMPILER) -g $(STD_FLAGS) -c  s21_string_tests.c
 
-test_case:
-	$(COMPILER) $(STD_FLAGS) -c test_cases/*.c
+test_case: test_cases/*.c
+	$(COMPILER) -g $(STD_FLAGS) -c  test_cases/*.c
 
 s21_string.a:
-	#$(COMPILER) $(STD_FLAGS) -c $(SOURCES_1) $(SOURCES_4)
-	$(COMPILER)  -c $(SOURCES_1) $(SOURCES_4)
+	$(COMPILER)   -c $(SOURCES_1) $(SOURCES_4)
 	ar rcs $(SOURCES_3) $(SOURCES_0)
 
 test: s21_string_with_coverage s21_string_tests.o test_case
@@ -45,6 +44,7 @@ gcov_report:
 clean:
 	rm -rf *.o
 	rm -rf *.a
+	rm -rf debug
 	rm -rf *.html *.gcno *.gcda *.o *.out *.css *coverage* *.a
 
 
@@ -57,8 +57,12 @@ style_correct:
 run: test
 	./test.out
 
-test_main: s21_string.a
-	gcc maintest.c -L. $(SOURCES_3)
-	./a.out
+test_main_debug: s21_string.a
+	gcc  maintest.c -L. $(SOURCES_3) -o debug
+
+
+test_debug: s21_string_with_coverage s21_string_tests.o test_case
+	$(COMPILER) -o test.out -g $(STD_FLAGS)  *.o   -L. $(SOURCES_3) $(COV_FLAGS) $(TEST_FLAGS_LINUX)
+
 
 

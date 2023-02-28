@@ -3,10 +3,11 @@
 
 
 int main() {
-    char ch_1;
-    char ch_2;
 
-    s21_sscanf("ab", "%c%c", &ch_1, &ch_2);
-    printf("ch_1 = %c\nch_2 = %c\n", ch_1, ch_2);
+    char str1[1000];
+    char str2[1000];
+
+    s21_sscanf("my number", "%s %s", str1, str2);
+    printf("%s %s\n", str1, str2);
     return 0;
 }
