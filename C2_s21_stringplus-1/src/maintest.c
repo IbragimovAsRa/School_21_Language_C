@@ -1,13 +1,22 @@
 #include <stdio.h>
 #include "s21_string.h"
 
-
+int test_func(CurrentSymbol *currentSymbol);
 int main() {
+    CurrentSymbol currentSymbol;
+    currentSymbol.str = "hello world";
+   // char str1[1000];
+//    char str2[1000];
+//
+//    s21_sscanf("my number", "%s %s", str1, str2);
+    test_func(&currentSymbol);
+       printf("%s\n", currentSymbol.str);
 
-    char str1[1000];
-    char str2[1000];
+    return 0;
+}
 
-    s21_sscanf("my number", "%s %s", str1, str2);
-    printf("%s %s\n", str1, str2);
+
+int test_func(CurrentSymbol *currentSymbol) {
+    currentSymbol->str += 5;
     return 0;
 }

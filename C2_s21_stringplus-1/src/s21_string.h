@@ -8,13 +8,17 @@
 #include <stdlib.h>
 
 typedef long unsigned s21_size_t;
-struct scan_specifier {
-    bool star; // reads data of the specified type, but suppresses their assignment
-    s21_size_t width; // limits the number of characters to be read for any field
-    s21_size_t length;
-    char specifier;
-};
 
+
+typedef struct Separator {
+    bool form;
+    bool str;
+} Separator;
+
+typedef struct CurrentSymbol {
+    const char *str;
+    const char *format;
+} CurrentSymbol;
 void *s21_memchr(const void *str, int c, s21_size_t n);
 
 int s21_memcmp(const void *str1, const void *str2, s21_size_t n);

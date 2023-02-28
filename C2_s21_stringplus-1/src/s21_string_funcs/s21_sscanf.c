@@ -16,7 +16,7 @@ char check_specifier(const char *sym_form_current);
 
 // функции возвращают 0 в случае успешного считывания и записи в противном случае 1 (спецификатор не считан/не записан)
 
-int specifier_c_handler(const char **sym_form_current, const char **sym_str_current, bool separator_form, char *tmp_c);
+int specifier_c_handler(const char **sym_form_current, const char **sym_str_current, Separator separator, char *tmp_c);
 
 int
 specifier_d_and_i_handler(const char **sym_form_current, const char **sym_str_current, int *tmp_d,
@@ -32,16 +32,22 @@ int
 specifier_s_handler(const char **sym_form_current, const char **sym_str_current, char *tmp_str);
 
 
-int separator_controller(const char **sym_form_current, const char **sym_str_current, bool *separator_form,
-                         bool *separator_str);
+int separator_controller(const char **sym_form_current, const char **sym_str_current, Separator *separator);
 
 void error_handler(int return_code, bool *flag_stop, int *counter);
 
-// int dispatcher_specifier(va_list *factor, );
+// int dispatcher_specifier(va_list *factor, bool *separator);
 
 int s21_sscanf(const char *str, const char *format, ...) {
-    bool separator_form = false;
-    bool separator_str = false;
+
+    Separator separator;
+    separator.form = false;
+    separator.str = false;
+
+    CurrentSymbol currentSymbol;
+    currentSymbol.format = format;
+    currentSymbol.str = str;
+
     const char *sym_form_current = format;
     const char *sym_str_current = str;
     va_list factor;
@@ -51,10 +57,10 @@ int s21_sscanf(const char *str, const char *format, ...) {
     int return_code = 0;
 
     while (*sym_form_current != '\0' && *sym_str_current != '\0' && !flag_stop) { // brute force of format characters
-        separator_controller(&sym_form_current, &sym_str_current, &separator_form, &separator_str);
+        separator_controller(&sym_form_current, &sym_str_current, &separator);
         switch (check_specifier(sym_form_current)) {
             case 'c':
-                return_code = specifier_c_handler(&sym_form_current, &sym_str_current, separator_form,
+                return_code = specifier_c_handler(&sym_form_current, &sym_str_current, separator,
                                                   va_arg(factor, char*));
                 break;
             case 'd':
@@ -119,12 +125,11 @@ specifier_s_handler(const char **sym_form_current, const char **sym_str_current,
 }
 
 
-int separator_controller(const char **sym_form_current, const char **sym_str_current, bool *separator_form,
-                         bool *separator_str) {
-    *separator_form = check_separator(*sym_form_current);
-    *separator_str = check_separator(*sym_str_current);
+int separator_controller(const char **sym_form_current, const char **sym_str_current, Separator *separator) {
+    separator->form = check_separator(*sym_form_current);
+    separator->str = check_separator(*sym_str_current);
     if (check_specifier(*sym_form_current) == 'c') {
-        if (*separator_form && *separator_str) { // выровнять каретки
+        if (separator->form && separator->str) { // выровнять каретки
             carriage_leveler(sym_str_current);
             carriage_leveler(sym_form_current);
         }
@@ -191,9 +196,9 @@ int specifier_d_and_i_handler(const char **sym_form_current, const char **sym_st
 
 
 int
-specifier_c_handler(const char **sym_form_current, const char **sym_str_current, bool separator_form, char *tmp_c) {
+specifier_c_handler(const char **sym_form_current, const char **sym_str_current, Separator separator, char *tmp_c) {
     *sym_form_current = (*sym_form_current + 1);
-    if (separator_form) { // переместить курсор строки до первого символа не пробел
+    if (separator.form) { // переместить курсор строки до первого символа не пробел
         carriage_leveler(sym_str_current);
     }
     if (**sym_str_current != '\0') {
