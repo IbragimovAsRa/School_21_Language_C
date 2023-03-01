@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "s21_string.h"
+#include "s21_string_funcs/headers/s21_string.h"
 
 int test_func(CurrentSymbol *currentSymbol);
 int main() {
@@ -17,6 +17,6 @@ int main() {
 
 
 int test_func(CurrentSymbol *currentSymbol) {
-    currentSymbol->str += 5;
+    printf("%c", *(currentSymbol->str + 1));
     return 0;
 }

@@ -10,15 +10,6 @@
 typedef long unsigned s21_size_t;
 
 
-typedef struct Separator {
-    bool form;
-    bool str;
-} Separator;
-
-typedef struct CurrentSymbol {
-    const char *str;
-    const char *format;
-} CurrentSymbol;
 void *s21_memchr(const void *str, int c, s21_size_t n);
 
 int s21_memcmp(const void *str1, const void *str2, s21_size_t n);
@@ -44,7 +35,6 @@ s21_size_t s21_strspn(const char *str1, const char *str2);
 // additional functions
 
 s21_size_t s21_strlen(const char *str);
-int s21_find_count_pattern(const char *str);
 
 // ------------------------------------------------------------------------
 

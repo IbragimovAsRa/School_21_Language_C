@@ -1,4 +1,4 @@
-#include "../s21_string.h"
+#include "headers/s21_string.h"
 
 char *s21_strcat(char *dest, const char *src) {
     char *str_in = dest;
