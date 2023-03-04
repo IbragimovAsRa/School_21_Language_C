@@ -11,7 +11,6 @@ SOURCES_0 = s21_*.o
 SOURCES_1 = s21_string_funcs/s21_*.c
 SOURCES_2 = s21_string_tests.c
 SOURCES_3 = s21_string.a
-SOURCES_4 = s21_string_funcs/utils/s21_*.c
 
 all: clean s21_string.a test run gcov_report
 
@@ -22,7 +21,7 @@ test_case: test_cases/*.c
 	$(COMPILER) -g $(STD_FLAGS) -c  test_cases/*.c
 
 s21_string.a:
-	$(COMPILER)   -c $(SOURCES_1) $(SOURCES_4)
+	$(COMPILER)  -g -c $(SOURCES_1)
 	ar rcs $(SOURCES_3) $(SOURCES_0)
 
 test: s21_string_with_coverage s21_string_tests.o test_case

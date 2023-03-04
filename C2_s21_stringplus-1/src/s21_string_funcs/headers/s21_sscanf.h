@@ -17,6 +17,13 @@ typedef struct CurrentSymbol {
     const char *format;
 } CurrentSymbol;
 
+typedef union Tmp {
+    void *a;
+    unsigned long int b;
+} Tmp;
+
+int s21_sscanf(const char *str, const char *format, ...);
+
 bool check_separator(const char *ch);
 
 void carriage_leveler(const char **str);
@@ -35,10 +42,12 @@ int specifier_o_u_x_handler(CurrentSymbol *currentSymbol, unsigned int *tmp_uni,
 
 int specifier_s_handler(CurrentSymbol *currentSymbol, char *tmp_str);
 
+int specifier_p_handler(CurrentSymbol *currentSymbol, void **tmp_p);
+
 int separator_controller(CurrentSymbol *currentSymbol, Separator *separator);
 
 void error_handler(int return_code, bool *flag_stop, int *counter);
 
-// int dispatcher_specifier(va_list *factor, bool *separator);
+int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *currentSymbol);
 
 #endif //SRC_S21_SSCANF_H

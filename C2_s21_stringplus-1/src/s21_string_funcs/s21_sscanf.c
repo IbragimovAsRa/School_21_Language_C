@@ -1,5 +1,5 @@
 #include "headers/s21_sscanf.h"
-
+#include "stdio.h"
 int s21_sscanf(const char *str, const char *format, ...) {
 
     Separator separator;
@@ -16,34 +16,10 @@ int s21_sscanf(const char *str, const char *format, ...) {
     bool flag_stop = false;
     int return_code = 0;
 
-    while (*(currentSymbol.format) != '\0' && *(currentSymbol.str) != '\0' && !flag_stop) { // brute force of format characters
+    while (*(currentSymbol.format) != '\0' && *(currentSymbol.str) != '\0' &&
+           !flag_stop) { // brute force of format characters
         separator_controller(&currentSymbol, &separator);
-        switch (check_specifier(currentSymbol)) {
-            case 'c':
-                return_code = specifier_c_handler(&currentSymbol, separator,va_arg(factor, char*));
-                break;
-            case 'd':
-                return_code = specifier_d_and_i_handler(&currentSymbol,va_arg(factor, int*), 'd');
-                break;
-            case 'i':
-                return_code = specifier_d_and_i_handler(&currentSymbol, va_arg(factor, int*), 'i');
-                break;
-            case 'e':
-                return_code = specifier_float_handler(&currentSymbol, va_arg(factor, float *));
-                break;
-            case 'o':
-                return_code = specifier_o_u_x_handler(&currentSymbol,va_arg(factor, unsigned int *), 'o');
-                break;
-            case 's':
-                return_code = specifier_s_handler(&currentSymbol,va_arg(factor, char *));
-                break;
-            case 'u':
-                return_code = specifier_o_u_x_handler(&currentSymbol,va_arg(factor, unsigned int *), 'u');
-                break;
-            case 'x':
-                return_code = specifier_o_u_x_handler(&currentSymbol,va_arg(factor, unsigned int *), 'x');
-                break;
-        }
+        return_code = dispatcher_specifier(&factor, separator, &currentSymbol);
         currentSymbol.format++;
         currentSymbol.str++;
         error_handler(return_code, &flag_stop, &counter);
@@ -52,6 +28,58 @@ int s21_sscanf(const char *str, const char *format, ...) {
     return counter;
 }
 
+
+int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *currentSymbol) {
+    int return_code = 0;
+    switch (check_specifier(*currentSymbol)) {
+        case 'c':
+            return_code = specifier_c_handler(currentSymbol, separator, va_arg(*factor, char*));
+            break;
+        case 'd':
+            return_code = specifier_d_and_i_handler(currentSymbol, va_arg(*factor, int*), 'd');
+            break;
+        case 'i':
+            return_code = specifier_d_and_i_handler(currentSymbol, va_arg(*factor, int*), 'i');
+            break;
+        case 'e':
+            return_code = specifier_float_handler(currentSymbol, va_arg(*factor, float *));
+            break;
+        case 'o':
+            return_code = specifier_o_u_x_handler(currentSymbol, va_arg(*factor, unsigned int *), 'o');
+            break;
+        case 's':
+            return_code = specifier_s_handler(currentSymbol, va_arg(*factor, char *));
+            break;
+        case 'u':
+            return_code = specifier_o_u_x_handler(currentSymbol, va_arg(*factor, unsigned int *), 'u');
+            break;
+        case 'x':
+            return_code = specifier_o_u_x_handler(currentSymbol, va_arg(*factor, unsigned int *), 'x');
+            break;
+        case 'p':
+            return_code = specifier_p_handler(currentSymbol, va_arg(*factor, void **));
+            break;
+    }
+    return return_code;
+}
+int specifier_p_handler(CurrentSymbol *currentSymbol, void **tmp_p) {
+    // 1) считать шестнадцетиричное число
+    char *end;
+    unsigned long int tmp_uni = 0;
+    int base = 16;
+    Tmp tmp;
+
+    carriage_leveler(&(currentSymbol->str));
+    currentSymbol->format = (currentSymbol->format + 1);
+
+    if (*(currentSymbol->str) != '\0') {
+        tmp_uni = (unsigned long int) strtoul(currentSymbol->str, &end, base);
+        currentSymbol->str = end;
+    }
+    tmp.b = tmp_uni;
+    *tmp_p = tmp.a;
+    return 0;
+}
 
 void error_handler(int return_code, bool *flag_stop, int *counter) {
     if (!(*flag_stop)) {
@@ -80,7 +108,7 @@ specifier_s_handler(CurrentSymbol *currentSymbol, char *tmp_str) {
 }
 
 
-int separator_controller(CurrentSymbol *currentSymbol,Separator *separator) {
+int separator_controller(CurrentSymbol *currentSymbol, Separator *separator) {
     separator->form = check_separator(currentSymbol->format);
     separator->str = check_separator(currentSymbol->str);
     if (check_specifier(*currentSymbol) == 'c') {
@@ -178,6 +206,8 @@ char check_specifier(CurrentSymbol currentSymbol) { // handler specifier
             specifier = 'u';
         } else if (ch == 'x') {
             specifier = 'x';
+        } else if (ch == 'p') {
+            specifier = 'p';
         }
     }
 
