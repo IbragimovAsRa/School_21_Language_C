@@ -45,7 +45,7 @@ Specifier check_specifier(CurrentSymbol currentSymbol);
 
 int specifier_c_handler(CurrentSymbol *currentSymbol, Separator separator, char *tmp_c, Counter *counter);
 
-int specifier_d_and_i_handler(CurrentSymbol *currentSymbol, Specifier specifier,  Counter *counter, ...);
+int specifier_d_and_i_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter);
 
 int specifier_float_handler(CurrentSymbol *currentSymbol, float *tmp_fl, Counter *counter);
 
