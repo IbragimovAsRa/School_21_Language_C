@@ -37,43 +37,50 @@ int s21_sscanf(const char *str, const char *format, ...) {
 
 int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *currentSymbol, Counter *counter) {
     int return_code = 0;
-    Specifier  specifier;
+    Specifier specifier;
     specifier = check_specifier(*currentSymbol);
 
-    switch (specifier.symbol) {
-        case 'c':
-            return_code = specifier_c_handler(currentSymbol, separator, va_arg(*factor, char*), counter);
-            break;
-        case 'd':
-            return_code = specifier_d_and_i_handler(currentSymbol, va_arg(*factor, int*), 'd', counter);
-            break;
-        case 'i':
-            return_code = specifier_d_and_i_handler(currentSymbol, va_arg(*factor, int*), 'i', counter);
-            break;
-        case 'e':
-            return_code = specifier_float_handler(currentSymbol, va_arg(*factor, float *), counter);
-            break;
-        case 'o':
-            return_code = specifier_o_u_x_handler(currentSymbol, va_arg(*factor, unsigned int *), 'o', counter);
-            break;
-        case 's':
-            return_code = specifier_s_handler(currentSymbol, va_arg(*factor, char *), counter);
-            break;
-        case 'u':
-            return_code = specifier_o_u_x_handler(currentSymbol, va_arg(*factor, unsigned int *), 'u', counter);
-            break;
-        case 'x':
-            return_code = specifier_o_u_x_handler(currentSymbol, va_arg(*factor, unsigned int *), 'x', counter);
-            break;
-        case 'p':
-            return_code = specifier_p_handler(currentSymbol, va_arg(*factor, void **), counter);
-            break;
-        case '%':
-            return_code = specifier_percent_handler(currentSymbol);
-            break;
+    // case 'c':
+    if (specifier.symbol == 'c') {
+        return_code = specifier_c_handler(currentSymbol, separator, va_arg(*factor, char*), counter);
     }
+    //case 'd':
+    //case 'i':
+    if (specifier.symbol == 'd' || specifier.symbol == 'i') {
+        if (specifier.skip) {
+            return_code = specifier_d_and_i_handler(currentSymbol, specifier, counter);
+        } else {
+            return_code = specifier_d_and_i_handler(currentSymbol, specifier, counter, va_arg(*factor, int*));
+        }
+    }
+    //case 'e':
+    if (specifier.symbol == 'e' || specifier.symbol == 'E' || specifier.symbol == 'f' || specifier.symbol == 'g' ||
+        specifier.symbol == 'G') {
+
+        return_code = specifier_float_handler(currentSymbol, va_arg(*factor, float *), counter);
+    }
+    //case 'o':
+    //case 'u':
+    //case 'x':
+    if (specifier.symbol == 'o' || specifier.symbol == 'u' || specifier.symbol == 'x') {
+        return_code = specifier_o_u_x_handler(currentSymbol, specifier, factor,  counter);
+    }
+    //case 's':
+    if (specifier.symbol == 's') {
+        return_code = specifier_s_handler(currentSymbol, specifier, factor, counter);
+    }
+    //case 'p':
+    if (specifier.symbol == 'p') {
+        return_code = specifier_p_handler(currentSymbol, va_arg(*factor, void **), counter);
+    }
+    //case '%':
+    if (specifier.symbol == '%') {
+        return_code = specifier_percent_handler(currentSymbol);
+    }
+
     return return_code;
 }
+
 int specifier_percent_handler(CurrentSymbol *currentSymbol) {
     currentSymbol->format++;
     return 0;
@@ -113,16 +120,22 @@ void error_handler(int return_code, bool *flag_stop, Counter *counter) {
 
 
 int
-specifier_s_handler(CurrentSymbol *currentSymbol, char *tmp_str, Counter *counter) {
+specifier_s_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter) {
     int i = 0;
+    char *tmp_str;
+    if (!specifier.skip) {
+        tmp_str = va_arg(*factor, char *);
+    }
     currentSymbol->format = currentSymbol->format + 1;
     while (*(currentSymbol->format) != '\0' && *(currentSymbol->str) != ' ') {
-        *(tmp_str + i) = *(currentSymbol->str);
+        if (!specifier.skip) {
+            *(tmp_str + i) = *(currentSymbol->str);
+        }
         currentSymbol->str = currentSymbol->str + 1;
         counter->readSymbols++;
         i++;
     }
-    if (i > 0) {
+    if (i > 0 && (!specifier.skip)) {
         *(tmp_str + (i + 1)) = '\0';
     }
     return 0;
@@ -132,7 +145,7 @@ specifier_s_handler(CurrentSymbol *currentSymbol, char *tmp_str, Counter *counte
 int separator_controller(CurrentSymbol *currentSymbol, Separator *separator, Counter *counter) {
     separator->form = check_separator(currentSymbol->format);
     separator->str = check_separator(currentSymbol->str);
-    if (check_specifier(*currentSymbol) == 'c') {
+    if (check_specifier(*currentSymbol).symbol == 'c') {
         if (separator->form && separator->str) { // выровнять каретки
             carriage_leveler(&(currentSymbol->str), counter);
             carriage_leveler(&(currentSymbol->format), counter);
@@ -145,22 +158,29 @@ int separator_controller(CurrentSymbol *currentSymbol, Separator *separator, Cou
     return 0;
 }
 
-int specifier_o_u_x_handler(CurrentSymbol *currentSymbol, unsigned int *tmp_uni, char specifier, Counter *counter) {
+int specifier_o_u_x_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor,  Counter *counter) {
+
     char *end;
     int base = 0;
+    unsigned int *tmp_uni;
 
-    if (specifier == 'o') {
+    if (specifier.symbol == 'o') {
         base = 8;
-    } else if (specifier == 'u') {
+    } else if (specifier.symbol == 'u') {
         base = 10;
-    } else if (specifier == 'x') {
+    } else if (specifier.symbol == 'x') {
         base = 16;
     }
     carriage_leveler(&(currentSymbol->str), counter);
     currentSymbol->format = (currentSymbol->format + 1);
 
-    if (*(currentSymbol->str) != '\0') {
-        *tmp_uni = (unsigned int) strtoul(currentSymbol->str, &end, base);
+    if (*(currentSymbol->str) != '\0'){
+        if (!specifier.skip) {
+            tmp_uni = va_arg(*factor, unsigned int*);
+            *tmp_uni = (unsigned int) strtoul(currentSymbol->str, &end, base);
+        } else {
+            strtoul(currentSymbol->str, &end, base);
+        }
         currentSymbol->str = end;
     }
     return 0;
@@ -178,21 +198,33 @@ int specifier_float_handler(CurrentSymbol *currentSymbol, float *tmp_fl, Counter
     return 0;
 }
 
-int specifier_d_and_i_handler(CurrentSymbol *currentSymbol, int *tmp_d, char specifier, Counter *counter) {
+int specifier_d_and_i_handler(CurrentSymbol *currentSymbol, Specifier specifier, Counter *counter, ...) {
+    va_list factor;
+    va_start(factor, counter);
     char *end;
-    int base;
-    if (specifier == 'd') {
+    int *tmp_d;
+
+
+    int base = 0;
+    if (specifier.symbol == 'd') {
         base = 10;
-    } else {
-        base = 0;
     }
+
     carriage_leveler(&(currentSymbol->str), counter);
     currentSymbol->format = (currentSymbol->format + 1);
 
+
     if (*(currentSymbol->str) != '\0') {
-        *tmp_d = (int) strtol(currentSymbol->str, &end, base);
+        if (!specifier.skip) {
+            tmp_d = va_arg(factor, int*);
+            *tmp_d = (int) strtol(currentSymbol->str, &end, base);
+        } else {
+            strtol(currentSymbol->str, &end, base);
+        }
         currentSymbol->str = end;
     }
+
+    va_end(factor);
     return 0;
 }
 
@@ -213,16 +245,30 @@ Specifier check_specifier(CurrentSymbol currentSymbol) { // handler specifier
     specifier.symbol = '!';
     specifier.skip = false;
 
-    char ch = *(currentSymbol.format + 1);
     if (*(currentSymbol.format) == '%') {
+        char ch = *(currentSymbol.format + 1);
+        if (ch == '*') {
+            specifier.skip = true;
+            ch = *(currentSymbol.format + 2);
+        }
+        // (ch == 'e' || ch == 'E' || ch == 'f' || ch == 'g' || ch == 'G')
+
         if (ch == 'c') {
             specifier.symbol = 'c';
         } else if (ch == 'd') {
             specifier.symbol = 'd';
         } else if (ch == 'i') {
             specifier.symbol = 'i';
-        } else if (ch == 'e' || ch == 'E' || ch == 'f' || ch == 'g' || ch == 'G') {
+        } else if (ch == 'e') {
             specifier.symbol = 'e';
+        } else if (ch == 'E') {
+            specifier.symbol = 'E';
+        } else if (ch == 'f') {
+            specifier.symbol = 'f';
+        } else if (ch == 'g') {
+            specifier.symbol = 'g';
+        } else if (ch == 'G') {
+            specifier.symbol = 'G';
         } else if (ch == 's') {
             specifier.symbol = 's';
         } else if (ch == 'u') {

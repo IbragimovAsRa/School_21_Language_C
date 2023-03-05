@@ -45,17 +45,18 @@ Specifier check_specifier(CurrentSymbol currentSymbol);
 
 int specifier_c_handler(CurrentSymbol *currentSymbol, Separator separator, char *tmp_c, Counter *counter);
 
-int specifier_d_and_i_handler(CurrentSymbol *currentSymbol, int *tmp_d, char specifier, Counter *counter);
+int specifier_d_and_i_handler(CurrentSymbol *currentSymbol, Specifier specifier,  Counter *counter, ...);
 
 int specifier_float_handler(CurrentSymbol *currentSymbol, float *tmp_fl, Counter *counter);
 
-int specifier_o_u_x_handler(CurrentSymbol *currentSymbol, unsigned int *tmp_uni, char specifier, Counter *counter);
+int specifier_o_u_x_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter);
 
-int specifier_s_handler(CurrentSymbol *currentSymbol, char *tmp_str, Counter *counter);
+int specifier_s_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter);
 
 int specifier_p_handler(CurrentSymbol *currentSymbol, void **tmp_p, Counter *counter);
 
 int specifier_percent_handler(CurrentSymbol *currentSymbol);
+
 int separator_controller(CurrentSymbol *currentSymbol, Separator *separator, Counter *counter);
 
 void error_handler(int return_code, bool *flag_stop, Counter *counter);
