@@ -4,10 +4,14 @@
 
 
 int main() {
-    int a = 1;
-    char ch;
-    sscanf("res %", "res %c", &ch);
-    printf("result = %c", ch);
+
+    s21_sscanf(test_str, pattern, &n1);
+    sscanf(test_str, pattern, &n2);
+    ck_assert_float_eq(n1, n2);
+
+    test_str = "hello 12.1223 12.11";
+    pattern = "hello %*f %f";
+    printf("result = %i", a);
 
 
     return 0;

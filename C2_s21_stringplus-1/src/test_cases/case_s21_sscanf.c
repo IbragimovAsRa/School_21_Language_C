@@ -212,6 +212,58 @@ START_TEST(sscanf_test_13) {
 
 END_TEST
 
+// test *
+START_TEST(sscanf_test_14) {
+    char *test_str = "hello world";
+    char *pattern = "%*s%s";
+    char tmp_str_1[256];
+    char tmp_str_2[256];
+
+
+    // int s21_result =
+    s21_sscanf(test_str, pattern, tmp_str_1);
+    //int result =
+    sscanf(test_str, pattern, tmp_str_2);
+
+    ck_assert_str_eq(tmp_str_1, tmp_str_2);
+}
+END_TEST
+
+// test float
+START_TEST(sscanf_test_15) {
+    char *test_str = "hello 12.1223";
+    char *pattern = "hello %f";
+    float n1;
+    float n2;
+
+    s21_sscanf(test_str, pattern, &n1);
+    sscanf(test_str, pattern, &n2);
+    ck_assert_float_eq(n1, n2);
+
+    test_str = "hello 12.1223";
+    pattern = "hello %4f";
+
+    s21_sscanf(test_str, pattern, &n1);
+    sscanf(test_str, pattern, &n2);
+    ck_assert_float_eq(n1, n2);
+
+    test_str = "number 12.32 65.45643";
+    pattern = "number %*f %f";
+
+    s21_sscanf(test_str, pattern, &n1);
+    sscanf(test_str, pattern, &n2);
+    ck_assert_float_eq(n1, n2);
+
+    test_str = "number 12325 65.45643";
+    pattern = "number %*4f %f";
+
+    s21_sscanf(test_str, pattern, &n1);
+    sscanf(test_str, pattern, &n2);
+    ck_assert_float_eq(n1, n2);
+
+
+}
+END_TEST
 
 Suite *get_suite_s21_sscanf() {
     Suite *s = suite_create("s21_sscanf suite ");
@@ -231,6 +283,10 @@ Suite *get_suite_s21_sscanf() {
     tcase_add_test(tc, sscanf_test_11);
     tcase_add_test(tc, sscanf_test_12);
     tcase_add_test(tc, sscanf_test_13);
+    tcase_add_test(tc, sscanf_test_14);
+    tcase_add_test(tc, sscanf_test_15);
+
+
 
 
 

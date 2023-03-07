@@ -5,8 +5,11 @@
 
 
 int main() {
-    ш
-
+    float n;
+    char *str = "number 12.32 65.45643";
+    char *pattern= "number %*f %f";
+    s21_sscanf(str, pattern, &n);
+    printf("result = %f\n", n);
     return 0;
 }
 
