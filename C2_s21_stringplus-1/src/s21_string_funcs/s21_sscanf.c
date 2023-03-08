@@ -44,20 +44,12 @@ int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *cu
     if (ch == 'c') {
         return_code = specifier_c_handler(currentSymbol, specifier, factor, separator, counter);
     }
-    if (ch == 'd' || ch == 'i') {
-        return_code = specifier_d_and_i_handler(currentSymbol, specifier, factor, counter);
-    }
-    if (ch == 'e' || ch == 'E' || ch == 'f' || ch == 'g' || ch == 'G') {
+    if (ch == 'e' || ch == 'E' || ch == 'f' || ch == 'g' || ch == 'G' || ch == 'd' || ch == 'i' || ch == 'o' ||
+        ch == 'u' || ch == 'x' || ch == 'p') {
         return_code = specifier_grl_handler(currentSymbol, specifier, factor, counter);
-    }
-    if (ch == 'o' || ch == 'u' || ch == 'x') {
-        return_code = specifier_o_u_x_handler(currentSymbol, specifier, factor, counter);
     }
     if (ch == 's') {
         return_code = specifier_s_handler(currentSymbol, specifier, factor, counter);
-    }
-    if (ch == 'p') {
-        return_code = specifier_p_handler(currentSymbol, specifier, factor, counter);
     }
     if (ch == '%') {
         return_code = specifier_percent_handler(currentSymbol);
@@ -67,33 +59,6 @@ int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *cu
 
 int specifier_percent_handler(CurrentSymbol *currentSymbol) {
     currentSymbol->format++;
-    return 0;
-}
-
-int specifier_p_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter) {
-    void **tmp_p;
-    char *end;
-    unsigned int step = 0;
-    unsigned long int tmp_uni = 0;
-    int base = 16;
-    Convert convert;
-    carriage_leveler(&(currentSymbol->str), counter);
-    currentSymbol->format = (currentSymbol->format + specifier.length);
-
-    if (*(currentSymbol->str) != '\0') {
-        tmp_uni = (unsigned long int) strtoul(currentSymbol->str, &end, base);
-        while ((currentSymbol->str + step) != end) {
-            step++;
-        }
-        counter->readSymbols += step;
-        currentSymbol->str = end;
-    }
-    if (!specifier.skip) {
-        tmp_p = va_arg(*factor, void **);
-        convert.hex = tmp_uni;
-        *tmp_p = convert.ptr;
-    }
-
     return 0;
 }
 
@@ -147,55 +112,67 @@ int separator_controller(CurrentSymbol *currentSymbol, Separator *separator, Cou
     return 0;
 }
 
-int specifier_o_u_x_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter) {
-
-    char *end;
-    int base = 0;
-    unsigned int *tmp_uni;
-
-    if (specifier.symbol == 'o') {
-        base = 8;
-    } else if (specifier.symbol == 'u') {
-        base = 10;
-    } else if (specifier.symbol == 'x') {
-        base = 16;
-    }
-    carriage_leveler(&(currentSymbol->str), counter);
-    currentSymbol->format = (currentSymbol->format + specifier.length);
-
-    if (*(currentSymbol->str) != '\0') {
-        if (!specifier.skip) {
-            tmp_uni = va_arg(*factor, unsigned int*);
-            *tmp_uni = (unsigned int) strtoul(currentSymbol->str, &end, base);
-        } else {
-            strtoul(currentSymbol->str, &end, base);
-        }
-        currentSymbol->str = end;
-    }
-    return 0;
-}
 
 int convert_skip_helper(const char *str_conv, Specifier specifier, Argument argument, char **end) {
     char ch = specifier.symbol;
+    int base = 0;
     TmpArgument tmpArgument;
+    Convert convert;
+
+    if (ch == 'o') {
+        base = 8;
+    } else if (ch == 'u' || ch == 'd') {
+        base = 10;
+    } else if (ch == 'x' || ch == 'p') {
+        base = 16;
+    }
+
     if (ch == 'e' || ch == 'E' || ch == 'f' || ch == 'g' || ch == 'G') {
         tmpArgument.fl = (float) strtof(str_conv, end);
         if (!specifier.skip) {
             *(argument.fl) = tmpArgument.fl;
         }
+    } else if (ch == 'd' || ch == 'i') {
+        tmpArgument.in = (int) strtol(str_conv, end, base);
+        if (!specifier.skip) {
+            *(argument.in) = tmpArgument.in;
+        }
+    } else if (ch == 'o' || ch == 'u' || ch == 'x') {
+        tmpArgument.uni = (unsigned int) strtoul(str_conv, end, base);
+        if (!specifier.skip) {
+            *(argument.uni) = tmpArgument.uni;
+        }
+    } else if (ch == 'p') {
+        tmpArgument.unli = (unsigned long int) strtoul(str_conv , end, base);
+        if (!specifier.skip) {
+            convert.hex = tmpArgument.unli;
+            *(argument.pch) = convert.ptr;
+        }
     }
-
     return 0;
 }
+
+//        while ((currentSymbol->str + step) != end) { счетчик считанных символов
+//            step++;
+//        }
+//        counter->readSymbols += step;
 
 int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter) {
     char *end;
     char tmp_str[100];
     Argument argument;
     if (!specifier.skip) {
-        argument.general = va_arg(*factor, void *);
+        if (specifier.symbol == 'p') {
+            argument.pch = va_arg(*factor, void **);
+        } else {
+            argument.general = va_arg(*factor, void *);
+        }
     } else {
-        argument.general = NULL;
+        if (specifier.symbol == 'p') {
+            argument.pch = NULL;
+        } else {
+            argument.general = NULL;
+        }
     }
     carriage_leveler(&(currentSymbol->str), counter);
     currentSymbol->format = (currentSymbol->format + specifier.length);
@@ -222,70 +199,6 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
 }
 
 
-int specifier_float_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter) {
-    char *end;
-    char tmp_str[100];
-    float *tmp_fl;
-    carriage_leveler(&(currentSymbol->str), counter);
-    currentSymbol->format = (currentSymbol->format + specifier.length);
-    if (*(currentSymbol->str) != '\0') {
-        if (!specifier.skip) {
-            tmp_fl = va_arg(*factor, float *);
-            if (specifier.width == 10e8) {
-                *tmp_fl = (float) strtof(currentSymbol->str, &end);
-                currentSymbol->str = end;
-            } else {
-                strncpy(tmp_str, currentSymbol->str, specifier.width);
-                *tmp_fl = (float) strtof(tmp_str, &end);
-                currentSymbol->str += specifier.width;
-            }
-        } else {
-            if (specifier.width == 10e8) {
-                (float) strtof(currentSymbol->str, &end);
-                currentSymbol->str = end;
-            } else {
-                currentSymbol->str += specifier.width;
-            }
-        }
-    }
-    return 0;
-}
-
-// "hello 1223345" "hello %i"
-int specifier_d_and_i_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter) {
-    char *end;
-    int *tmp_d;
-    char tmp_str[100];
-    int base = 0;
-    if (specifier.symbol == 'd') {
-        base = 10;
-    }
-    carriage_leveler(&(currentSymbol->str), counter);
-    currentSymbol->format = (currentSymbol->format + specifier.length);
-    if (*(currentSymbol->str) != '\0') {
-        if (!specifier.skip) {
-            tmp_d = va_arg(*factor, int*);
-            if (specifier.width == 10e8) {
-                *tmp_d = (int) strtol(currentSymbol->str, &end, base);
-                currentSymbol->str = end;
-            } else {
-                strncpy(tmp_str, currentSymbol->str, specifier.width);
-                *tmp_d = (int) strtol(tmp_str, &end, base);
-                currentSymbol->str += specifier.width;
-            }
-        } else {
-            if (specifier.width == 10e8) {
-                strtol(currentSymbol->str, &end, base);
-                currentSymbol->str = end;
-            } else {
-                currentSymbol->str += specifier.width;
-            }
-        }
-    }
-    return 0;
-}
-
-
 int specifier_c_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Separator separator,
                         Counter *counter) {
     char *tmp_c;
@@ -301,8 +214,6 @@ int specifier_c_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_li
     }
     return 0;
 }
-
-// %*100s
 
 Specifier check_specifier(CurrentSymbol currentSymbol) { // handler specifier
     Specifier specifier;

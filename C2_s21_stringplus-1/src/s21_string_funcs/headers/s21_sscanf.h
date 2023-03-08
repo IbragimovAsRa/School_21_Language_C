@@ -33,13 +33,17 @@ typedef union  Convert {
 
 typedef union Argument {
     void *general;
+    void ** pch;
     float *fl;
+    int *in;
     unsigned int *uni;
 } Argument;
 
 typedef union TmpArgument {
     float fl;
+    int in;
     unsigned int uni;
+    unsigned long int unli;
 } TmpArgument;
 
 typedef struct Specifier {
