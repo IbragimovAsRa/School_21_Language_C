@@ -57,7 +57,7 @@ run: test
 	./test.out
 
 test_main_debug: s21_string.a
-	gcc -g maintest.c -L. $(SOURCES_3) -o debug
+	gcc -g $(STD_FLAGS) maintest.c -L. $(SOURCES_3) -o debug
 
 
 test_debug: s21_string_with_coverage s21_string_tests.o test_case

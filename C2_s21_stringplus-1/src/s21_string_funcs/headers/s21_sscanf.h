@@ -6,10 +6,11 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+
+// обьявить нул самим
 typedef struct Separator {
     bool form;
     bool str;
@@ -22,7 +23,7 @@ typedef struct CurrentSymbol {
 
 typedef struct Counter {
     unsigned int assignedValues;
-    unsigned int readSymbols;
+    int readSymbols;
 } Counter;
 
 
@@ -35,15 +36,27 @@ typedef union Argument {
     void *general;
     void ** pch;
     float *fl;
+    double *lfl;
+    long double *llfl;
     int *in;
+    long int *lin;
+    unsigned long int *unli;
+    short int *shi;
     unsigned int *uni;
+    unsigned short int *unshi;
 } Argument;
 
 typedef union TmpArgument {
     float fl;
+    double lfl;
+    long double llfl;
     int in;
+    short int shi;
     unsigned int uni;
+    long int lin;
     unsigned long int unli;
+    unsigned short int unshi;
+
 } TmpArgument;
 
 typedef struct Specifier {
@@ -51,6 +64,7 @@ typedef struct Specifier {
     unsigned int width;
     char symbol;
     unsigned int length;
+    char lengthSymbol;
 
 } Specifier;
 
@@ -61,6 +75,9 @@ int parse_width(CurrentSymbol currentSymbol, Specifier *specifier);
 int skip_check(CurrentSymbol currentSymbol, Specifier *specifier);
 
 int width_check(CurrentSymbol currentSymbol, Specifier *specifier);
+
+int length_check(CurrentSymbol currentSymbol, Specifier *specifier);
+
 
 int s21_sscanf(const char *str, const char *format, ...);
 
@@ -92,18 +109,11 @@ void error_handler(int return_code, bool *flag_stop, Counter *counter);
 
 int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *currentSymbol, Counter *counter);
 
-
-
-
-
-
-
 int convert_skip_helper(const char *str_conv, Specifier specifier, Argument argument, char **end);
 
 int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter);
 
-
-
+int specifier_n_handler( va_list *factor, Counter *counter);
 
 
 

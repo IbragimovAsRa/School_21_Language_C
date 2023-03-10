@@ -5,23 +5,26 @@
 void test_func_s21(Suite *s);
 
 int main(void) {
-    Suite *array_test_cases[20];
-
-    array_test_cases[0] = get_suite_s21_memchr();
-    array_test_cases[1] = get_suite_s21_memcmp();
-    array_test_cases[2] = get_suite_s21_memmove();
-    array_test_cases[4] = get_suite_s21_strpbrk();
-    array_test_cases[5] = get_suite_s21_strspn();
-
-    for (int i = 0; i < 5; i++) {
-        test_func_s21(array_test_cases[i]);
-    }
+//    Suite *array_test_cases[20];
+//
+//    array_test_cases[0] = get_suite_s21_memchr();
+//    array_test_cases[1] = get_suite_s21_memcmp();
+//    array_test_cases[2] = get_suite_s21_memmove();
+//    array_test_cases[4] = get_suite_s21_strpbrk();
+//    array_test_cases[5] = get_suite_s21_strspn();
+//
+//    for (int i = 0; i < 5; i++) {
+//        test_func_s21(array_test_cases[i]);
+//    }
 
     printf("START TEST sscanf\n");
-    Suite *scan_test_cases[20];
+    Suite *s21_sscanf_test_cases[20];
 
-    scan_test_cases[0] = get_suite_s21_sscanf();
-    test_func_s21(scan_test_cases[0]);
+    s21_sscanf_test_cases[0] = get_suite_s21_sscanf();
+    s21_sscanf_test_cases[1] = get_suite_s21_sscanf_c();
+
+    test_func_s21(s21_sscanf_test_cases[0]);
+    test_func_s21(s21_sscanf_test_cases[1]);
 
     return 0;
 }

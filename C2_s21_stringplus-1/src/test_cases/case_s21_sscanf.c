@@ -265,6 +265,30 @@ START_TEST(sscanf_test_15) {
 }
 END_TEST
 
+
+START_TEST(sscanf_test_16) {
+    char test_str[100] = "hello world";
+    char pattern[100] = "hello %n world";
+    int count1;
+    int count2;
+
+
+    s21_sscanf(test_str, pattern, &count1);
+    sscanf(test_str, pattern, &count2);
+    ck_assert_int_eq(count1, count2);
+
+
+    count1 = 0;
+    count2 = 0;
+    strcpy(test_str, "hello world");
+    strcpy(pattern, "hello world%n");
+    s21_sscanf(test_str, pattern, &count1);
+    sscanf(test_str, pattern, &count2);
+    ck_assert_int_eq(count1, count2);
+
+}
+END_TEST
+
 Suite *get_suite_s21_sscanf() {
     Suite *s = suite_create("s21_sscanf suite ");
     TCase *tc = tcase_create("s21_sscanf test case");
@@ -285,10 +309,7 @@ Suite *get_suite_s21_sscanf() {
     tcase_add_test(tc, sscanf_test_13);
     tcase_add_test(tc, sscanf_test_14);
     tcase_add_test(tc, sscanf_test_15);
-
-
-
-
+    tcase_add_test(tc, sscanf_test_16);
 
     return s;
 }

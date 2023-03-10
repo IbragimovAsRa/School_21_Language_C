@@ -5,11 +5,19 @@
 
 
 int main() {
-    float n;
-    char *str = "number 12.32 65.45643";
-    char *pattern= "number %*f %f";
-    s21_sscanf(str, pattern, &n);
-    printf("result = %f\n", n);
+
+    char *test_str = "hello world";
+    char *pattern = "hello world%n";
+    unsigned int count1;
+    unsigned int count2;
+
+
+    s21_sscanf(test_str, pattern, &count1);
+    sscanf(test_str, pattern, &count2);
+
+    printf("result 1 = %i", count1);
+    printf("result 2 = %i", count2);
+
     return 0;
 }
 

@@ -31,6 +31,9 @@ int s21_sscanf(const char *str, const char *format, ...) {
         counter.readSymbols++;
         error_handler(return_code, &flag_stop, &counter);
     }
+    return_code = dispatcher_specifier(&factor, separator, &currentSymbol, &counter);
+   // error_handler(return_code, &flag_stop, &counter);
+
     va_end(factor);
     return counter.assignedValues;
 }
@@ -51,11 +54,21 @@ int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *cu
     if (ch == 's') {
         return_code = specifier_s_handler(currentSymbol, specifier, factor, counter);
     }
+    if (ch == 'n') {
+        return_code = specifier_n_handler( factor, counter);
+    }
     if (ch == '%') {
         return_code = specifier_percent_handler(currentSymbol);
     }
     return return_code;
 }
+
+int specifier_n_handler(va_list *factor, Counter *counter) {
+    int *count = va_arg(*factor, int *);
+    *count = (counter->readSymbols) - 1 ;
+    return 0;
+}
+
 
 int specifier_percent_handler(CurrentSymbol *currentSymbol) {
     currentSymbol->format++;
@@ -75,26 +88,30 @@ void error_handler(int return_code, bool *flag_stop, Counter *counter) {
 int
 specifier_s_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter) {
     unsigned int i = 0;
-    char *tmp_str;
-    if (!specifier.skip) {
+    char *tmp_str = NULL ;
+    wchar_t *tmp_lstr = NULL;
+    if (!specifier.skip && specifier.lengthSymbol == 'l') {
+        tmp_lstr = va_arg(*factor, int *);
+    } else if (!specifier.skip) {
         tmp_str = va_arg(*factor, char *);
     }
-
     currentSymbol->format = currentSymbol->format + specifier.length;
     while (*(currentSymbol->format) != '\0' && *(currentSymbol->str) != ' ' && specifier.width > i) {
-        if (!specifier.skip) {
+        if (!specifier.skip && specifier.lengthSymbol == 'l' ) {
+            *(tmp_lstr + i) = (int)*(currentSymbol->str);
+        } else if (!specifier.skip) {
             *(tmp_str + i) = *(currentSymbol->str);
         }
         currentSymbol->str = currentSymbol->str + 1;
         counter->readSymbols++;
         i++;
     }
-    if (i > 0 && (!specifier.skip)) {
+    if (i > 0 && (!specifier.skip) && specifier.lengthSymbol != 'l') {
         *(tmp_str + i) = '\0';
     }
+
     return 0;
 }
-
 
 int separator_controller(CurrentSymbol *currentSymbol, Separator *separator, Counter *counter) {
     separator->form = check_separator(currentSymbol->format);
@@ -115,10 +132,10 @@ int separator_controller(CurrentSymbol *currentSymbol, Separator *separator, Cou
 
 int convert_skip_helper(const char *str_conv, Specifier specifier, Argument argument, char **end) {
     char ch = specifier.symbol;
-    int base = 0;
     TmpArgument tmpArgument;
     Convert convert;
 
+    int base = 0;
     if (ch == 'o') {
         base = 8;
     } else if (ch == 'u' || ch == 'd') {
@@ -128,25 +145,42 @@ int convert_skip_helper(const char *str_conv, Specifier specifier, Argument argu
     }
 
     if (ch == 'e' || ch == 'E' || ch == 'f' || ch == 'g' || ch == 'G') {
-        tmpArgument.fl = (float) strtof(str_conv, end);
+        tmpArgument.llfl = (long double) strtof(str_conv, end);
         if (!specifier.skip) {
-            *(argument.fl) = tmpArgument.fl;
+            if (specifier.lengthSymbol == 'l') {
+                *(argument.lfl) = (double) tmpArgument.llfl;
+            } else if (specifier.lengthSymbol == 'L') {
+                *(argument.llfl) = tmpArgument.llfl;
+            } else {
+                *(argument.fl) = (float) tmpArgument.llfl;
+            }
         }
     } else if (ch == 'd' || ch == 'i') {
-        tmpArgument.in = (int) strtol(str_conv, end, base);
+        tmpArgument.lin = strtol(str_conv, end, base); // сделать проверку если не скип
         if (!specifier.skip) {
-            *(argument.in) = tmpArgument.in;
+            if (specifier.lengthSymbol == 'h') {
+                *(argument.shi) = (short int) tmpArgument.lin;
+            } else if (specifier.lengthSymbol == 'l') {
+                *(argument.lin) = (long int) tmpArgument.lin;
+            } else {
+                *(argument.in) = (int) tmpArgument.lin;
+            }
         }
-    } else if (ch == 'o' || ch == 'u' || ch == 'x') {
-        tmpArgument.uni = (unsigned int) strtoul(str_conv, end, base);
+    } else if (ch == 'o' || ch == 'u' || ch == 'x' || ch == 'X' || ch == 'p') {
+        tmpArgument.unli = (unsigned long int) strtoul(str_conv, end, base);
         if (!specifier.skip) {
-            *(argument.uni) = tmpArgument.uni;
-        }
-    } else if (ch == 'p') {
-        tmpArgument.unli = (unsigned long int) strtoul(str_conv , end, base);
-        if (!specifier.skip) {
-            convert.hex = tmpArgument.unli;
-            *(argument.pch) = convert.ptr;
+            if (ch == 'p') {
+                convert.hex = tmpArgument.unli;
+                *(argument.pch) = convert.ptr;
+            } else {
+                if (specifier.lengthSymbol == 'h') {
+                    *(argument.unshi) = (unsigned short int) tmpArgument.unli;
+                } else if (specifier.lengthSymbol == 'l') {
+                    *(argument.unli) = tmpArgument.unli;
+                } else {
+                    *(argument.uni) = (unsigned int) tmpArgument.unli;
+                }
+            }
         }
     }
     return 0;
@@ -202,14 +236,21 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
 int specifier_c_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Separator separator,
                         Counter *counter) {
     char *tmp_c;
+    wchar_t *tmp_lc;
+
     currentSymbol->format = (currentSymbol->format + specifier.length);
     if (separator.form) { // переместить курсор строки до первого символа не пробел
         carriage_leveler(&(currentSymbol->str), counter);
     }
     if (*(currentSymbol->str) != '\0') {
         if (!specifier.skip) {
-            tmp_c = va_arg(*factor, char *);
-            *tmp_c = *(currentSymbol->str);
+            if (specifier.lengthSymbol == 'l') {
+                tmp_lc = va_arg(*factor, int *);
+                *tmp_lc = (int) *(currentSymbol->str);
+            } else {
+                tmp_c = va_arg(*factor, char *);
+                *tmp_c = *(currentSymbol->str);
+            }
         }
     }
     return 0;
@@ -225,6 +266,7 @@ Specifier check_specifier(CurrentSymbol currentSymbol) { // handler specifier
 
         skip_check(currentSymbol, &specifier);
         width_check(currentSymbol, &specifier);
+        length_check(currentSymbol, &specifier);
 
         char ch = *(currentSymbol.format + specifier.length);
 
@@ -250,6 +292,10 @@ Specifier check_specifier(CurrentSymbol currentSymbol) { // handler specifier
             specifier.symbol = 'u';
         } else if (ch == 'x') {
             specifier.symbol = 'x';
+        } else if (ch == 'X') {
+            specifier.symbol = 'X';
+        } else if (ch == 'n') {
+            specifier.symbol = 'n';
         } else if (ch == 'p') {
             specifier.symbol = 'p';
         } else if (ch == '%') {
@@ -297,6 +343,14 @@ int skip_check(CurrentSymbol currentSymbol, Specifier *specifier) {
     return 0;
 }
 
+int length_check(CurrentSymbol currentSymbol, Specifier *specifier) {
+    char ch = *(currentSymbol.format + specifier->length + 1);
+    if (ch == 'h' || ch == 'l' || ch == 'L') {
+        specifier->lengthSymbol = ch;
+        specifier->length++;
+    }
+    return 0;
+}
 
 void carriage_leveler(const char **str, Counter *counter) {
     while (**str == ' ') {
