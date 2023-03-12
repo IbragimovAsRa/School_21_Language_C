@@ -44,6 +44,8 @@ clean:
 	rm -rf *.o
 	rm -rf *.a
 	rm -rf debug
+	rm -rf maintest
+
 	rm -rf *.html *.gcno *.gcda *.o *.out *.css *coverage* *.a
 
 

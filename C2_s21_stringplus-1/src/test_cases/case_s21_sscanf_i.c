@@ -1152,6 +1152,21 @@ START_TEST(sscanf_spec_li_hex_8) {
 }
 END_TEST
 
+START_TEST(sscanf_spec_hi_0) {
+    char format[] = "%hi%hi%hi";
+    char str[] = "123 +198 -87";
+     short d1, d2;
+ short q1, q2;
+     short z1 = 0, z2 = 0;
+
+    int16_t res1 = s21_sscanf(str, format, &d1, &q1, &z1);
+    int16_t res2 = sscanf(str, format, &d2, &q2, &z2);
+    ck_assert_int_eq(res1, res2);
+    ck_assert_int_eq(d1, d2);
+    ck_assert_int_eq(q1, q2);
+    ck_assert_int_eq(z1, z2);
+}
+END_TEST
 Suite *get_suite_s21_sscanf_i() {
     Suite *s = suite_create("s21_sscanf_i suite ");
     TCase *tc = tcase_create("s21_sscanf_i test case");
@@ -1236,6 +1251,7 @@ Suite *get_suite_s21_sscanf_i() {
     tcase_add_test(tc, sscanf_spec_li_hex_6);
     tcase_add_test(tc, sscanf_spec_li_hex_7);
     tcase_add_test(tc, sscanf_spec_li_hex_8);
+    tcase_add_test(tc, sscanf_spec_hi_0);
 
     return s;
 }

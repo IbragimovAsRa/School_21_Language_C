@@ -11,6 +11,7 @@ int s21_sscanf(const char *str, const char *format, ...) {
     CurrentSymbol currentSymbol;
     currentSymbol.format = format;
     currentSymbol.str = str;
+    currentSymbol.defaultStr = str;
 
     Counter counter;
     counter.assignedValues = 0;
@@ -35,6 +36,7 @@ int s21_sscanf(const char *str, const char *format, ...) {
    // error_handler(return_code, &flag_stop, &counter);
 
     va_end(factor);
+
     return counter.assignedValues;
 }
 
@@ -55,7 +57,7 @@ int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *cu
         return_code = specifier_s_handler(currentSymbol, specifier, factor, counter);
     }
     if (ch == 'n') {
-        return_code = specifier_n_handler( factor, counter);
+        return_code = specifier_n_handler(currentSymbol ,factor);
     }
     if (ch == '%') {
         return_code = specifier_percent_handler(currentSymbol);
@@ -66,11 +68,25 @@ int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *cu
     }
     return return_code;
 }
-
-int specifier_n_handler(va_list *factor, Counter *counter) {
+int calculate_readed_sym(CurrentSymbol *currentSymbol) {
+    int i =0;
+    while (currentSymbol->str != (currentSymbol->defaultStr + i)) {
+        i++;
+    }
+    return i;
+}
+int specifier_n_handler(CurrentSymbol *currentSymbol, va_list *factor) {
+    int return_code = 4;
+    int readed_sym = calculate_readed_sym( currentSymbol);
     int *count = va_arg(*factor, int *);
-    *count = (counter->readSymbols) - 1 ;
-    return 0;
+    if (readed_sym == 0) {
+        return_code = 1;
+    } else {
+        currentSymbol->str--;
+    }
+    *count =  readed_sym;
+    currentSymbol->format++;
+    return return_code;
 }
 
 
@@ -201,6 +217,9 @@ int convert_skip_helper(const char *str_conv, Specifier specifier, Argument argu
 int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter) {
     char *end;
     char tmp_str[100];
+    for (int i = 0; i < 100; i++) {
+        tmp_str[i] = '\0';
+    }
     Argument argument;
     int return_code = 0;
     if (!specifier.skip) {
@@ -223,7 +242,9 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
         if (!specifier.skip) {
             if (specifier.width == 10e8) {
                 return_code = convert_skip_helper(currentSymbol->str, specifier, argument, &end);
-                currentSymbol->str = end - 1;
+                if (currentSymbol->str != end) {
+                    currentSymbol->str = end - 1;
+                }
             } else {
                 strncpy(tmp_str, currentSymbol->str, specifier.width);
                 return_code = convert_skip_helper(tmp_str, specifier, argument, &end);
@@ -232,10 +253,14 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
         } else {
             if (specifier.width == 10e8) {
                 return_code = convert_skip_helper(currentSymbol->str, specifier, argument, &end);
-                currentSymbol->str = end - 1;
+                if (currentSymbol->str != end) {
+                    currentSymbol->str = end - 1;
+                }
             } else {
                 convert_skip_helper(currentSymbol->str, specifier, argument, &end);
-                currentSymbol->str += cur_str_helper(currentSymbol->str, end) - 1;
+                if (cur_str_helper(currentSymbol->str, end) > 0) {
+                    currentSymbol->str += cur_str_helper(currentSymbol->str, end) - 1;
+                }
             }
         }
     }
@@ -316,7 +341,9 @@ Specifier check_specifier(CurrentSymbol currentSymbol) { // handler specifier
             specifier.symbol = 'X';
         } else if (ch == 'n') {
             specifier.symbol = 'n';
-        } else if (ch == 'p') {
+        } else if (ch == 'o') {
+            specifier.symbol = 'o';
+        }  else if (ch == 'p') {
             specifier.symbol = 'p';
         } else if (ch == '%') {
             specifier.symbol = '%';

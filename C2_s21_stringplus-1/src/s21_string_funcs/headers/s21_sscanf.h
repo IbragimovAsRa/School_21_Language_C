@@ -19,6 +19,7 @@ typedef struct Separator {
 typedef struct CurrentSymbol {
     const char *str;
     const char *format;
+    const char *defaultStr;
 } CurrentSymbol;
 
 typedef struct Counter {
@@ -77,6 +78,7 @@ int skip_check(CurrentSymbol currentSymbol, Specifier *specifier);
 int width_check(CurrentSymbol currentSymbol, Specifier *specifier);
 
 int length_check(CurrentSymbol currentSymbol, Specifier *specifier);
+int calculate_readed_sym(CurrentSymbol *currentSymbol);
 
 
 int s21_sscanf(const char *str, const char *format, ...);
@@ -113,7 +115,7 @@ int convert_skip_helper(const char *str_conv, Specifier specifier, Argument argu
 
 int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Counter *counter);
 
-int specifier_n_handler( va_list *factor, Counter *counter);
+int specifier_n_handler(CurrentSymbol *currentSymbol,va_list *factor);
 
 
 

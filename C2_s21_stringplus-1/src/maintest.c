@@ -5,28 +5,27 @@
 #include <stdint.h>
 
 int main() {
-    char format[] = "%i%i%i";
-    // char str[] = "0123 +0198 -087";
-    char str[] = "+0123 +0198";
-    unsigned int d1, d2;
-    unsigned int q1, q2;
-    unsigned int z1, z2;
+    char format[] = "Hello %n ";
+    char str[] = "Hello";
+    int n1 = 0, n2 = 0;
 
-    int16_t res1 = s21_sscanf(str, format, &d1, &q1, &z1);
-    int16_t res2 = sscanf(str, format, &d2, &q2, &z2);
+     s21_sscanf(str, format, &n1);
+     sscanf(str, format, &n2);
 
 
-    printf("res1 = %i\n", res1);
-    printf("res2 = %i\n", res2);
+    printf("res1 = %i\n", n1);
+    printf("res2 = %i\n", n2);
 
-    printf("d1 = %i\n", d1);
-    printf("d2 = %i\n", d2);
 
-    printf("q1 = %i\n", q1);
-    printf("q2 = %i\n", q2);
 
-    printf("z1 = %i\n", z1);
-    printf("z2 = %i\n", z2);
+//    printf("d1 = %i\n", d1);
+//    printf("d2 = %i\n", d2);
+//
+//    printf("q1 = %i\n", q1);
+//    printf("q2 = %i\n", q2);
+//
+//    printf("z1 = %i\n", z1);
+//    printf("z2 = %i\n", z2);
     return 0;
 }
 
