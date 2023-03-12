@@ -223,24 +223,25 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
         if (!specifier.skip) {
             if (specifier.width == 10e8) {
                 return_code = convert_skip_helper(currentSymbol->str, specifier, argument, &end);
-                currentSymbol->str = end;
+                currentSymbol->str = end - 1;
             } else {
                 strncpy(tmp_str, currentSymbol->str, specifier.width);
                 return_code = convert_skip_helper(tmp_str, specifier, argument, &end);
-                currentSymbol->str += (specifier.width - 1);
+                currentSymbol->str += cur_str_helper(tmp_str, end) - 1;
             }
         } else {
             if (specifier.width == 10e8) {
                 return_code = convert_skip_helper(currentSymbol->str, specifier, argument, &end);
-                currentSymbol->str = end;
+                currentSymbol->str = end - 1;
             } else {
-                currentSymbol->str += (specifier.width - 1);
+                convert_skip_helper(currentSymbol->str, specifier, argument, &end);
+                currentSymbol->str += cur_str_helper(currentSymbol->str, end) - 1;
             }
         }
     }
     return return_code;
 }
-int cur_str_helper(char *str, char *end) {
+int cur_str_helper(const char *str, char *end) {
     int result = 0;
     while (str != end) {
         str++;

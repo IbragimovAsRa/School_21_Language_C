@@ -5,11 +5,12 @@
 #include <stdint.h>
 
 int main() {
-    char format[] = "%1i %i %1i";
-    char str[] = "13 +137 -8";
+    char format[] = "%i%i%i";
+    // char str[] = "0123 +0198 -087";
+    char str[] = "+0123 +0198";
     unsigned int d1, d2;
     unsigned int q1, q2;
-    unsigned int z1 = 0, z2 = 0;
+    unsigned int z1, z2;
 
     int16_t res1 = s21_sscanf(str, format, &d1, &q1, &z1);
     int16_t res2 = sscanf(str, format, &d2, &q2, &z2);
