@@ -68,7 +68,7 @@ typedef struct Specifier {
 
 } Specifier;
 
-
+int cur_str_helper(char *str, char *end);
 int parse_width(CurrentSymbol currentSymbol, Specifier *specifier);
 
 

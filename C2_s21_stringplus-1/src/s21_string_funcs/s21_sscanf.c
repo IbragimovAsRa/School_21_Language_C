@@ -227,7 +227,7 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
             } else {
                 strncpy(tmp_str, currentSymbol->str, specifier.width);
                 return_code = convert_skip_helper(tmp_str, specifier, argument, &end);
-                currentSymbol->str += specifier.width;
+                currentSymbol->str += (specifier.width - 1);
             }
         } else {
             if (specifier.width == 10e8) {
@@ -240,7 +240,14 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
     }
     return return_code;
 }
-
+int cur_str_helper(char *str, char *end) {
+    int result = 0;
+    while (str != end) {
+        str++;
+        result++;
+    }
+    return result;
+}
 
 int specifier_c_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_list *factor, Separator separator,
                         Counter *counter) {
@@ -356,7 +363,7 @@ int skip_check(CurrentSymbol currentSymbol, Specifier *specifier) {
 }
 
 int length_check(CurrentSymbol currentSymbol, Specifier *specifier) {
-    char ch = *(currentSymbol.format + specifier->length + 1);
+    char ch = *(currentSymbol.format + specifier->length);
     if (ch == 'h' || ch == 'l' || ch == 'L') {
         specifier->lengthSymbol = ch;
         specifier->length++;
