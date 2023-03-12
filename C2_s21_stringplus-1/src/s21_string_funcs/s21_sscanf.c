@@ -31,7 +31,7 @@ int s21_sscanf(const char *str, const char *format, ...) {
         counter.readSymbols++;
         error_handler(return_code, &flag_stop, &counter);
     }
-    return_code = dispatcher_specifier(&factor, separator, &currentSymbol, &counter);
+    dispatcher_specifier(&factor, separator, &currentSymbol, &counter);
    // error_handler(return_code, &flag_stop, &counter);
 
     va_end(factor);
@@ -59,6 +59,10 @@ int dispatcher_specifier(va_list *factor, Separator separator, CurrentSymbol *cu
     }
     if (ch == '%') {
         return_code = specifier_percent_handler(currentSymbol);
+    }
+
+    if (return_code != 1 && specifier.skip) {
+        return_code = 3;
     }
     return return_code;
 }
@@ -134,7 +138,7 @@ int convert_skip_helper(const char *str_conv, Specifier specifier, Argument argu
     char ch = specifier.symbol;
     TmpArgument tmpArgument;
     Convert convert;
-
+    int return_code = 0;
     int base = 0;
     if (ch == 'o') {
         base = 8;
@@ -183,7 +187,10 @@ int convert_skip_helper(const char *str_conv, Specifier specifier, Argument argu
             }
         }
     }
-    return 0;
+    if (str_conv == *end) {
+        return_code = 1;
+    }
+    return return_code;
 }
 
 //        while ((currentSymbol->str + step) != end) { счетчик считанных символов
@@ -195,6 +202,7 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
     char *end;
     char tmp_str[100];
     Argument argument;
+    int return_code = 0;
     if (!specifier.skip) {
         if (specifier.symbol == 'p') {
             argument.pch = va_arg(*factor, void **);
@@ -202,6 +210,7 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
             argument.general = va_arg(*factor, void *);
         }
     } else {
+        return_code = 3;
         if (specifier.symbol == 'p') {
             argument.pch = NULL;
         } else {
@@ -213,23 +222,23 @@ int specifier_grl_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_
     if (*(currentSymbol->str) != '\0') {
         if (!specifier.skip) {
             if (specifier.width == 10e8) {
-                convert_skip_helper(currentSymbol->str, specifier, argument, &end);
+                return_code = convert_skip_helper(currentSymbol->str, specifier, argument, &end);
                 currentSymbol->str = end;
             } else {
                 strncpy(tmp_str, currentSymbol->str, specifier.width);
-                convert_skip_helper(tmp_str, specifier, argument, &end);
+                return_code = convert_skip_helper(tmp_str, specifier, argument, &end);
                 currentSymbol->str += specifier.width;
             }
         } else {
             if (specifier.width == 10e8) {
-                convert_skip_helper(currentSymbol->str, specifier, argument, &end);
+                return_code = convert_skip_helper(currentSymbol->str, specifier, argument, &end);
                 currentSymbol->str = end;
             } else {
                 currentSymbol->str += (specifier.width - 1);
             }
         }
     }
-    return 0;
+    return return_code;
 }
 
 
@@ -237,7 +246,10 @@ int specifier_c_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_li
                         Counter *counter) {
     char *tmp_c;
     wchar_t *tmp_lc;
-
+    int return_code = 0;
+    if (specifier.skip) {
+        return_code = 3;
+    }
     currentSymbol->format = (currentSymbol->format + specifier.length);
     if (separator.form) { // переместить курсор строки до первого символа не пробел
         carriage_leveler(&(currentSymbol->str), counter);
@@ -253,7 +265,7 @@ int specifier_c_handler(CurrentSymbol *currentSymbol, Specifier specifier, va_li
             }
         }
     }
-    return 0;
+    return return_code;
 }
 
 Specifier check_specifier(CurrentSymbol currentSymbol) { // handler specifier
@@ -353,7 +365,7 @@ int length_check(CurrentSymbol currentSymbol, Specifier *specifier) {
 }
 
 void carriage_leveler(const char **str, Counter *counter) {
-    while (**str == ' ') {
+    while (**str == ' ' || **str == '\n' || **str == '\t') {
         *str = *str + 1;
         counter->readSymbols++;
     }
@@ -361,7 +373,7 @@ void carriage_leveler(const char **str, Counter *counter) {
 
 bool check_separator(const char *ch) {
     bool result = false;
-    if (*ch == ' ') {
+    if (*ch == ' ' || *ch == '\t' || *ch == '\n') {
         result = true;
     }
     return result;

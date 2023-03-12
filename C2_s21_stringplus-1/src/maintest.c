@@ -2,21 +2,15 @@
 //#include "s21_string_funcs/headers/s21_string.h"
 #include "s21_string_funcs/headers/s21_sscanf.h"
 #include <string.h>
-
+#include <stdint.h>
 
 int main() {
-
-    char *test_str = "hello world";
-    char *pattern = "hello world%n";
-    unsigned int count1;
-    unsigned int count2;
-
-
-    s21_sscanf(test_str, pattern, &count1);
-    sscanf(test_str, pattern, &count2);
-
-    printf("result 1 = %i", count1);
-    printf("result 2 = %i", count2);
+    char *end;
+    char *str = "laruna";
+    strtol(str, &end, 10);
+    if (str != end) {
+        printf("result = %s", end);
+    }
 
     return 0;
 }

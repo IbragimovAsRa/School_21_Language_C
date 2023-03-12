@@ -16,6 +16,7 @@ Suite *get_suite_s21_strspn();
 
 Suite *get_suite_s21_sscanf();
 Suite *get_suite_s21_sscanf_c();
+Suite *get_suite_s21_sscanf_d();
 
 
 #endif  // SRC_S21_STRING_TESTS_H_

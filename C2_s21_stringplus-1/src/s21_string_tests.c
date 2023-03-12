@@ -22,9 +22,11 @@ int main(void) {
 
     s21_sscanf_test_cases[0] = get_suite_s21_sscanf();
     s21_sscanf_test_cases[1] = get_suite_s21_sscanf_c();
+    s21_sscanf_test_cases[2] = get_suite_s21_sscanf_d();
 
     test_func_s21(s21_sscanf_test_cases[0]);
     test_func_s21(s21_sscanf_test_cases[1]);
+    test_func_s21(s21_sscanf_test_cases[2]);
 
     return 0;
 }

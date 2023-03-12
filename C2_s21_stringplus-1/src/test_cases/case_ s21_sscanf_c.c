@@ -82,21 +82,6 @@ START_TEST(sscanf_c_test_5) {
 }
 END_TEST
 
-//START_TEST(sscanf_c_test_6) {
-//
-//}
-//END_TEST
-//
-//START_TEST(sscanf_c_test_7) {
-//
-//}
-//END_TEST
-//
-//START_TEST(sscanf_c_test_8) {
-//
-//}
-//END_TEST
-
 
 Suite *get_suite_s21_sscanf_c() {
     Suite *s = suite_create("s21_sscanf_c suite ");
@@ -109,12 +94,8 @@ Suite *get_suite_s21_sscanf_c() {
     tcase_add_test(tc, sscanf_c_test_3);
     tcase_add_test(tc, sscanf_c_test_4);
     tcase_add_test(tc, sscanf_c_test_5);
-
-//    tcase_add_test(tc, sscanf_c_test_6);
-//    tcase_add_test(tc, sscanf_c_test_7);
-//    tcase_add_test(tc, sscanf_c_test_8);
-
-
     return s;
 }
+
+// доделать тест на модификаторы длины
 
