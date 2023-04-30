@@ -36,7 +36,6 @@ memcheck: test_convert
 
 test_convert: $(LIB) test_convert.o test_case_convert.o
 	$(CC) $(CFLAGS) test_convert.o test_case_convert.o $(LIB) $(TEST_FLAGS) -o test_convert
-	./test_convert
 
 test_convert.o:
 	$(CC) -c $(CFLAGS) test_convert.c -o test_convert.o 
@@ -49,7 +48,7 @@ test_case_convert.o:
 
 
 clean:
-	rm -rf *.o test *.a *.gcno *.gcda *.gcov  test_convert
+	rm -rf *.o test *.a *.gcno *.gcda *.gcov  test_convert convert
 	*.html *.css *.info report main/*.o s21_math debug convert
 
 

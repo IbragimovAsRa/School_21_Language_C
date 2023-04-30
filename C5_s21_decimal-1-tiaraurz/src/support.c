@@ -626,7 +626,7 @@ void mntBigZero(bigDecimal* res) {
 
 void printBit(s21_decimal val) {
     for (int i = 127; i >= 0; i--) {
-        if (i == 95 || i == 126 || i == 127) printf(" ");
+        if (i == 95 || i == 119 || i == 111||  i == 126 || i == 127) printf(" ");
         printf("%u", isSetBit(val.bits, i));
     }
     printf("\n");

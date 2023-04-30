@@ -83,6 +83,7 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     return ret;
 }
 
+
 // // 0 - OK
 // // 1 - INF
 // // 2 - MINF

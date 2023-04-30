@@ -107,14 +107,15 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     dst->bits[1] = 0;
     dst->bits[2] = 0;
     dst->bits[3] = 0;
-    float tmp_src = src;
+    long double tmp_src = (long double)src;
+
     int flag_sign = 0;
     if (src < 0.0) {
         tmp_src *= -1;
         flag_sign = 1;
     }
     int exp = 0;
-    float exp_helper = 1000000; // отвечает за 7 значащих цифр
+    long double exp_helper = 1000000; // отвечает за 7 значащих цифр
     if (tmp_src < exp_helper) { // 1-ый исход
         while (tmp_src / exp_helper < 1.0) {
             exp++;
@@ -129,13 +130,12 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     
     dst->pat.mnt1 = (unsigned int) tmp_src; // обработка случая больших чисел
     // округлятор --------------------
-    /*
+    
     unsigned int a =  (unsigned int) tmp_src;
-    float a_f = (float) a;
+    long double a_f = (long double)a;
     if ((tmp_src - a_f) >= 0.5) {
         dst->pat.mnt1 += 1;
     }
-    */
    // ------------------------------------
     while (exp < 0) {
         multByTen(dst);
