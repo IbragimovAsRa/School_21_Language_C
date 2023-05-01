@@ -1,14 +1,11 @@
 #include "convert.h"
 
-// 1-случай: 0.0000324998234 -> 324998.234 (необходимо привести к такому виду)
-// 2- случай: 1233432321.234341 ->
-//void
-//print_bit(unsigned int num) {
-//    for (int i = sizeof(num) * 8 - 1; i >= 0; i--) {
-//        printf("%d", (num >> i) & 1);
-//    }
-//    printf("\n");
-//}
+int s21_get_bit(s21_decimal value, int index)
+{
+    int idxRow = getRow(index);
+    int idxCol = getCol(index);
+    return (value.bits[idxRow] & (1u << idxCol)) >> idxCol;
+}
 int setBitForDec(s21_decimal* dc, int index, int value) {
 
     if (value == 1) {
@@ -47,24 +44,24 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst) {
 }
 
 int s21_from_decimal_to_float(s21_decimal src, float *dst) {
+    unsigned int result = 0;
+
+    BigUnInt bigUnInt = {{src.bits[0], src.bits[1]}};
     FloatConvert floatConvert;
     int sign = isSetBit(src.bits,127);
     int exp_10 = src.pat.exp;
-    float tmp_fl;
-
-
+    double tmp_fl = (double)bigUnInt.value;
     unsigned int mantis = 0;
     int exp_2 = 0;
 
-    if (exp_10 > 0) {
-        tmp_fl = src.bits[0];
+    if (exp_10 > 0) { // корректно отрабатывает
         for (int i = 1; i < (exp_10+1); i++) {
             tmp_fl = tmp_fl/10.0;
         }
         if (sign) {
             tmp_fl = -tmp_fl;
         }
-        *dst = tmp_fl;
+        *dst = (float)tmp_fl;
 
     } else {
         for (int i = 95; i >= 0; i--) {
@@ -74,35 +71,46 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
             }
         }
         // заполнение мантиссы
-       // unsigned int bit = 0;
         int current_bit_index = 0;
         for (int i = 22; i >= 0; i--) {
             current_bit_index = (exp_2 - (22 - i));
-            if (isSetBit(&(src.bits[getRow(current_bit_index)]), getCol(current_bit_index))) {
-                mantis |= (1 << i);
+            if (current_bit_index >= 0) {
+                if (isSetBit(&(src.bits[getRow(current_bit_index)]), getCol(current_bit_index)))
+                {
+                    mantis |= (1 << i);
+                }
             }
         }
-        mantis = mantis >> (22 - exp_2);
-        mantis = mantis << (22 - exp_2);
         FloatPattern floatPattern;
         floatPattern.mantis = 0;
         floatPattern.mantis = mantis;
         floatPattern.exp = 0;
         floatPattern.exp |= (exp_2 + 127 + 1) << 23;
-
         floatPattern.sign = 0;
         if (sign == 1) {
             floatPattern.sign |= (1 << 31);
         }
-
         floatConvert.un = (floatPattern.sign | floatPattern.exp | floatPattern.mantis);
         *dst = floatConvert.fl;
-
     }
-    return 0;
+    return result;
 }
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
+    unsigned int result = 0;
+    if (src == S21_INF || src == -S21_INF) {
+        result = 1;
+    } else if (fabs(src) > 0 && fabs(src) < 1e-28) { // числа слишком малы
+            dst->bits[0] = 0;
+            dst->bits[1] = 0;
+            dst->bits[2] = 0;
+            dst->bits[3] = 0;
+            result = 1;
+    } else if (fabs(src) > 79228162514264337593543950335.0) {
+            result = 1;
+    } else if (isnan(src)) {
+            result = 1;
+    } else {
     dst->bits[0] = 0;
     dst->bits[1] = 0;
     dst->bits[2] = 0;
@@ -130,13 +138,11 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     
     dst->pat.mnt1 = (unsigned int) tmp_src; // обработка случая больших чисел
     // округлятор --------------------
-    
     unsigned int a =  (unsigned int) tmp_src;
     long double a_f = (long double)a;
     if ((tmp_src - a_f) >= 0.5) {
         dst->pat.mnt1 += 1;
     }
-   // ------------------------------------
     while (exp < 0) {
         multByTen(dst);
         exp++;
@@ -145,12 +151,78 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     if (flag_sign == 1) {
         inverseBit(&(dst->bits[3]), 31);
     }
+    }
+    return result;
+}
 
-    /* доделать обработку исключений
-     *
-    printf("input src  = %f\n", src);
-    printf("base  = %i\n", (int)tmp_src);
-    printf("exp = %i\n", exp);
-     */
-    return 0;
+int s21_from_decimal_to_int(s21_decimal src, int *dst) {
+    int result = 0;
+    uint8_t exp = 0;
+    int sign = isSetBit(src.bits, 127);
+    BigUnInt bigUnInt = {{src.bits[0], src.bits[1]}};
+    exp = src.pat.exp;
+    if (exp > 0) {
+        for (int i = exp; i > 0; i--) {
+            bigUnInt.value = bigUnInt.value / 10;
+        }
+    }
+    // Валидация 
+    if (find_index_first_nonzero_bit(src) > 63 && exp == 0) { // слишком большое значение
+        result = 1;
+    } else if ((sign == 1) && (bigUnInt.value > 2147483648)) {
+        result = 1;
+    } else if ((sign == 0) && (bigUnInt.value > 2147483647)) {
+        result = 1;
+    }
+    if (result == 0) {
+        *dst = (int)bigUnInt.value;
+        if (sign) {
+            *dst = *dst * (-1);
+        }
+    }
+    return result;
+}
+
+int find_index_first_nonzero_bit(s21_decimal dc) {
+    int result = 0;
+    for (int i = 95; i >= 0; i--) {
+        if (isSetBit(dc.bits, i)) {
+            result = i;
+            break;
+        }
+    }
+    return result;
+}
+
+int pow10(int val) { // заменить
+    int result = 1;
+
+    for (int i = 0; i < val; i++) {
+        result *= 10;
+    }
+    return result;
+
+}
+
+void printBitFloat(float fl) {
+    float f = fl;
+    unsigned int *p = (unsigned int *)&f;
+
+    for (int i = 31; i >= 0; i--)
+    {
+        printf("%d", (*p & (1 << i)) != 0);
+    }
+    printf("\n");
+}
+
+void printUnIntt(unsigned int un_i)
+{
+    unsigned int  f = un_i;
+    unsigned int *p = &f;
+
+    for (int i = 31; i >= 0; i--)
+    {
+        printf("%d", (*p & (1 << i)) != 0);
+    }
+    printf("\n");
 }

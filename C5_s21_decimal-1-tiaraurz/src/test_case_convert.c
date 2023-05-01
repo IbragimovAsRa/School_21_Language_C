@@ -608,63 +608,280 @@ START_TEST(convert_test_55)
     ck_assert_int_eq(s21_is_equal(dec1, dec2), 1);
 }
 END_TEST
+
+
+//------------ test from decimal to int------------------
+// классические случаи
 START_TEST(convert_test_56)
-{
-    s21_decimal dec1 = {{0b00000000000000000000101110001000,
+{   
+    int a;
+    s21_decimal dec1 = {{0b00000000000000000000000001111011,
                          0b00000000000000000000000000000000,
                          0b00000000000000000000000000000000,
-                         0b00000000000111000000000000000000}};
-    s21_decimal dec2 = {};
-    s21_from_float_to_decimal(0.0000000000000000000000002952213808, &dec2);
-    ck_assert_int_eq(s21_is_equal(dec1, dec2), 1);
+                         0b10000000000000000000000000000000}}; // тестируемое число: 123
+    s21_from_decimal_to_int(dec1,&a);
+    ck_assert_int_eq(-123, a);
 }
 END_TEST
+
 START_TEST(convert_test_57)
 {
-    s21_decimal dec1 = {{0b00000000000000000000010001111000,
+    int a;
+    s21_decimal dec1 = {{0b00000000001100001111111101101010,
                          0b00000000000000000000000000000000,
                          0b00000000000000000000000000000000,
-                         0b00000000000111000000000000000000}};
-    s21_decimal dec2 = {};
-    s21_from_float_to_decimal(0.0000000000000000000000001143523029, &dec2);
-    ck_assert_int_eq(s21_is_equal(dec1, dec2), 1);
+                         0b00000000000000000000000000000000}};
+    s21_from_decimal_to_int(dec1, &a);
+    ck_assert_int_eq(3211114, a);
 }
 END_TEST
 START_TEST(convert_test_58)
 {
-    s21_decimal dec1 = {{0b00000000000000000001001000101110,
+    int a;
+    s21_decimal dec1 = {{0b00000000000000000000000000000000,
                          0b00000000000000000000000000000000,
                          0b00000000000000000000000000000000,
-                         0b00000000000111000000000000000000}};
-    s21_decimal dec2 = {};
-    s21_from_float_to_decimal(0.000000000000000000000000465423125, &dec2);
-    ck_assert_int_eq(s21_is_equal(dec1, dec2), 1);
+                         0b00000000000000000000000000000000}};
+    s21_from_decimal_to_int(dec1, &a);
+    ck_assert_int_eq(0, a);
 }
 END_TEST
 START_TEST(convert_test_59)
 {
-    s21_decimal dec1 = {{0b00000000000000000000010110110110,
+    int a;
+    s21_decimal dec1 = {{0b00000000000000010100110000000001,
                          0b00000000000000000000000000000000,
                          0b00000000000000000000000000000000,
-                         0b00000000000111000000000000000000}};
-    s21_decimal dec2 = {};
-    s21_from_float_to_decimal(0.00000000000000000000000014616116, &dec2);
-    ck_assert_int_eq(s21_is_equal(dec1, dec2), 1);
-}
-END_TEST
-START_TEST(convert_test_60)
-{
-    s21_decimal dec1 = {{0b00000000000000000000100110010001,
-                         0b00000000000000000000000000000000,
-                         0b00000000000000000000000000000000,
-                         0b00000000000111000000000000000000}};
-    s21_decimal dec2 = {};
-    s21_from_float_to_decimal(0.0000000000000000000000002449420232, &dec2);
-    ck_assert_int_eq(s21_is_equal(dec1, dec2), 1);
+                         0b00000000000000000000000000000000}};
+    s21_from_decimal_to_int(dec1, &a);
+    ck_assert_int_eq(84993, a);
 }
 END_TEST
 
-//------------ test from decimal to int------------------
+START_TEST(convert_test_60)
+{
+    int a;
+    s21_decimal dec1 = {{0b00000000000000010100110000000001,
+                         0b00000100010000000001000000000000,
+                         0b00000000000000000000000000000000,
+                         0b00000000000000000000000000000000}};
+    s21_from_decimal_to_int(dec1, &a);
+    ck_assert_int_eq(s21_from_decimal_to_int(dec1, &a), 1);
+}
+END_TEST
+START_TEST(convert_test_61)
+{
+    int a;
+    s21_decimal dec1 = {{0b00000000011000101100100001010100,
+                         0b00000000000000000000000000000000,
+                         0b00000000000000000000000000000000,
+                         0b00000000000000100000000000000000}};
+    s21_from_decimal_to_int(dec1, &a);
+    ck_assert_int_eq(64738, a);
+}
+END_TEST
+START_TEST(convert_test_62)
+{
+    int a;
+    s21_decimal dec1 = {{0b00000000001011111100011101100010,
+                         0b00000000000000000000000000000000,
+                         0b00000000000000000000000000000000,
+                         0b00000000000001000000000000000000}};
+    s21_from_decimal_to_int(dec1, &a);
+    ck_assert_int_eq(313, a);
+}
+END_TEST
+START_TEST(convert_test_63)
+{
+    int a;
+    s21_decimal dec1 = {{0b00000000000100010010010001011001,
+                         0b00000000000000000000000000000000,
+                         0b00000000000000000000000000000000,
+                         0b00000000000000100000000000000000}};
+    s21_from_decimal_to_int(dec1, &a);
+    ck_assert_int_eq(11234, a);
+}
+END_TEST
+START_TEST(convert_test_64)
+{
+    int a;
+    s21_decimal dec1 = {{0b00000000000100101101011010000111,
+                         0b00000000000000000000000000000000,
+                         0b00000000000000000000000000000000,
+                         0b00000000000000000000000000000000}};
+    s21_from_decimal_to_int(dec1, &a);
+    ck_assert_int_eq(1234567, a);
+}
+END_TEST
+
+// decimal to float
+START_TEST(convert_test_65)
+{
+    float a = 123.321;
+    float b;
+    s21_decimal dec = {{0b00000000000000011110000110111001,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000110000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.001);
+}
+END_TEST
+START_TEST(convert_test_66)
+{
+    float a = 313.1234;
+    float b;
+    s21_decimal dec = {{0b00000000001011111100011101100010,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000001000000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.001);
+}
+END_TEST
+START_TEST(convert_test_67)
+{
+    float a = 123423.13123;
+    float b;
+    s21_decimal dec = {{0b00000000000100101101010100110111,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000010000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.1);
+}
+END_TEST
+
+START_TEST(convert_test_68)
+{
+    float a = 1234.4321;
+    float b;
+    s21_decimal dec = {{0b00000000000100101101011000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000110000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.001);
+}
+END_TEST
+
+START_TEST(convert_test_69)
+{
+    float a = 12345;
+    float b;
+    s21_decimal dec = {{0b00000000000000000011000000111001,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.001);
+}
+END_TEST
+
+START_TEST(convert_test_70)
+{
+    float a = 123456789987654321;
+    float b;
+    s21_decimal dec = {{0b00110101000110110100000000000000,
+                        0b00000001101101101001101101001110,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 10000000000);
+}
+END_TEST
+
+START_TEST(convert_test_71)
+{
+    float a = 123456789987654321.123881193;
+    float b;
+    s21_decimal dec = {{0b00110101000110110100000000000000,
+                        0b00000001101101101001101101001110,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 10000000000);
+}
+END_TEST
+
+START_TEST(convert_test_72)
+{
+    float a = 0.0000000000001234567;
+    float b;
+    s21_decimal dec = {{0b00000000000100101101011010000111,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000100110000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.0000000000000000001);
+}
+END_TEST
+
+START_TEST(convert_test_73)
+{
+    float a = 0.0000000000000001234;
+    float b;
+    s21_decimal dec = {{0b00000000000000000000010011010010,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000100110000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.0000000000000000001);
+}
+END_TEST
+
+
+START_TEST(convert_test_74)
+{
+    float a = 0.000000000000000123456789;
+    float b;
+    s21_decimal dec = {{0b00000000000100101101011010001000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000101100000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.0000000000000000001);
+}
+END_TEST
+
+START_TEST(convert_test_75)
+{
+    float a = 123456789123456789123456789.0;
+    float b;
+    s21_decimal dec = {{0b00000000100000000000000000000000,
+                        0b10001001110101001111000000001100,
+                        0b00000000011001100001111011111110,
+                        0b00000000000000000000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 1e+26);
+}
+END_TEST
+
+START_TEST(convert_test_76)
+{
+    float a = 0.00000000000000012345678912345678;
+    float b;
+    s21_decimal dec = {{0b01110001111110110000100100100011,
+                        0b00000000000000000000000100011111,
+                        0b00000000000000000000000000000000,
+                        0b00000000000111000000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.0000000000000000001);
+}
+END_TEST
+
+START_TEST(convert_test_77)
+{
+    float a = 432.4;
+    float b;
+    s21_decimal dec = {{0b00000000000000000001000011100100,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000000000000000000000,
+                        0b00000000000000010000000000000000}};
+    s21_from_decimal_to_float(dec, &b);
+    ck_assert_float_eq_tol(a, b, 0.0000000000000000001);
+}
+END_TEST
 Suite *
 get_suite_convert()
 {
@@ -732,6 +949,23 @@ get_suite_convert()
     tcase_add_test(tc, convert_test_58);
     tcase_add_test(tc, convert_test_59);
     tcase_add_test(tc, convert_test_60);
+    tcase_add_test(tc, convert_test_61);
+    tcase_add_test(tc, convert_test_62);
+    tcase_add_test(tc, convert_test_63);
+    tcase_add_test(tc, convert_test_64);
+    tcase_add_test(tc, convert_test_65);
+    tcase_add_test(tc, convert_test_66);
+    tcase_add_test(tc, convert_test_67);
+    tcase_add_test(tc, convert_test_68);
+    tcase_add_test(tc, convert_test_69);
+    tcase_add_test(tc, convert_test_70);
+    tcase_add_test(tc, convert_test_71);
+    tcase_add_test(tc, convert_test_72);
+    tcase_add_test(tc, convert_test_73);
+    tcase_add_test(tc, convert_test_74);
+    tcase_add_test(tc, convert_test_75);
+    tcase_add_test(tc, convert_test_76);
+    tcase_add_test(tc, convert_test_77);
 
     return s;
 }

@@ -1,5 +1,5 @@
 #include "convert.h"
-
+#include "support.h"
 int main () {
 //    s21_decimal b;
       //s21_decimal result
@@ -41,25 +41,33 @@ int main () {
 //    s21_from_float_to_decimal(fl1, &dc);
 //    s21_from_decimal_to_float(dc, &fl2);
 //    printf("         |        |\n");
-//    printBit(dc);
+    // printBit(dc);
 //    printf("my = %f\n", fl2);
 //    printf("orig = %f\n", fl1);
 // ----------------------------------------------------------------------
 
-// s21_decimal dec1 = {{0b00000000000000000000010110110110,
-//                      0b00000000000000000000000000000000,
-//                      0b00000000000000000000000000000000,
-//                      0b00000000000111000000000000000000}};
-s21_decimal dec2 = {};
-s21_from_float_to_decimal(0.00000000000000000000000014616116, &dec2);
-printBit(dec2);
+// for (int i = 31; i >= 0; i--)
+// {
+//     printf("%d", (*p2 & (1 << i)) != 0);
+//     }
+//     printf("\n");
+
+// int f2 = -2147483648;
+// unsigned int *p2 = (unsigned int *)&f2;
+// float a = 11234.1734;
+float a = -123456789987654321;
+float b;
+s21_decimal dec = {{0b00110101000110110100000000000000,
+                    0b00000001101101101001101101001110,
+                    0b00000000000000000000000000000000,
+                    0b00000000000000000000000000000000}};
+s21_from_decimal_to_float(dec, &b);
+
+printBitFloat(a);
+printBitFloat(b);
+
+printf("fl_1 = %0.25f\n", a);
+printf("fl_2 = %0.25f\n", b);
 return 0;
 }
-
-
-
-
-
-
-
 
