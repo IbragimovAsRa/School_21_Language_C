@@ -24,10 +24,10 @@ int s21_mult_number(s21_matrix_t* A, double number, s21_matrix_t* result);
 int s21_mult_matrix(s21_matrix_t* A, s21_matrix_t* B, s21_matrix_t* result);
 int s21_transpose(s21_matrix_t* A, s21_matrix_t* result);
 int s21_calc_complements(s21_matrix_t* A, s21_matrix_t* result);
-
+int s21_determinant(s21_matrix_t* A, double* result);
+int s21_inverse_matrix(s21_matrix_t* A, s21_matrix_t* result);
 
 // Helper funсtions
-double s21_calc_determinant(s21_matrix_t A);
 s21_matrix_t s21_cut(int rows[2], int columns[2], s21_matrix_t A);
 s21_matrix_t s21_cut_lines(int cut_row, int cut_columns,
                           s21_matrix_t A); // cut_row = -1  если строку/столбец удалять не надо

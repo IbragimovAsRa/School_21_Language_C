@@ -1,12 +1,38 @@
 #include "s21_matrix.h"
 
+int s21_inverse_matrix(s21_matrix_t* A, s21_matrix_t* result) {
+  int return_code = 0;
+  double determ = 0;
+  s21_matrix_t tmp_matrix = {};
+  s21_determinant(A, &determ);
+  if (determ == 0) {
+    return_code = 1;
+  }
+  if (return_code == 0) {
+    s21_calc_complements(A, &tmp_matrix);
+    s21_printMatrix(tmp_matrix);
+    s21_transpose(&tmp_matrix, result);
+    s21_printMatrix(*result);
+    s21_remove_matrix(&tmp_matrix);
+    for (int i = 0; i < result->rows; i++) {
+      for (int j = 0; j < result->columns; j ++) {
+        result->matrix[i][j] = -result->matrix[i][j];
+      }
+    }
+  }
+  return return_code;
+}
 int s21_calc_complements(s21_matrix_t* A, s21_matrix_t* result) {
   int return_code = 0;
+  double tmp_determ = 0;
+  s21_matrix_t tmp_matrix = {};
   s21_create_matrix(A->rows, A->columns, result);
-  for (int i = 0;i < result->rows; i++) {
+  for (int i = 0; i < result->rows; i++) {
     for (int j = 0; j < result->columns; j++) {
-      result->matrix[i][j] = s21_calc_determinant(s21_cut_lines(i,j, *A))*s21_pow_int(-1, (i + j));
-
+      tmp_matrix = s21_cut_lines(i, j, *A);
+      s21_determinant(&tmp_matrix, &tmp_determ);
+      result->matrix[i][j] = tmp_determ * s21_pow_int(-1, (i + j));
+      s21_remove_matrix(&tmp_matrix);
     }
   }
   return return_code;
@@ -134,23 +160,25 @@ int s21_transpose(s21_matrix_t* A, s21_matrix_t* result) {
   return return_code;
 }
 
-double  s21_calc_determinant(s21_matrix_t A) {
-  // int return_code = 0;
-  double result = 0;
+int s21_determinant(s21_matrix_t* A, double* result) {
+  int return_code = 0;
+  *result = 0;
+  double temp_determ = 0;
   int k = 1;
   s21_matrix_t M;
 
-  if (A.rows == 1) {
-    result = A.matrix[0][0];
+  if (A->rows == 1) {
+    *result = A->matrix[0][0];
   } else {
-    for (int j = 0; j < A.rows; j++) {
-      M = s21_cut_lines(0, j, A);
-      result += k*A.matrix[0][j] * s21_calc_determinant(M);
+    for (int j = 0; j < A->rows; j++) {
+      M = s21_cut_lines(0, j, *A);
+      s21_determinant(&M, &temp_determ);
+      *result += k * A->matrix[0][j] * temp_determ;
       k = -k;
       s21_remove_matrix(&M);
     }
   }
-  return result; // return_code;  // result;
+  return return_code;  // result;
 }
 
 s21_matrix_t s21_cut_lines(int cut_row, int cut_columns, s21_matrix_t A) {
@@ -254,8 +282,13 @@ void s21_printMatrix(s21_matrix_t a) {
 
 int s21_pow_int(int k, int exp) {
   int result = k;
+  if (exp == 0) {
+    result = -k;
+  }else  {
+
   for (int i = 1; i < exp; i++) {
     result = result * k;
+  }
   }
   return result;
 }
