@@ -1,7 +1,8 @@
 CC= gcc
 CFLAGS = -g -Wall -Werror -Wextra -std=c11
-SOURSES_C= stack_char.c transform_dkstr.c
-SOURSES_O= stack_char.o transform_dkstr.o
+DATASTRUCTS_C = datastructs/*.c
+SOURSES_C= datastructs/*.c parse_input.c
+SOURSES_O= linked_list.o stack_list.o parse_input.o 
 LIB=SmartCalc.a
 
 main.o:	
@@ -18,6 +19,8 @@ memcheck:	main
 	valgrind --leak-check=full ./main
 run: main
 	./main
+format:
+	clang-format -i *.c *.h
 clean:
 	rm -rf *.o
 	rm -rf *.a main

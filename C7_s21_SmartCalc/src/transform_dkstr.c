@@ -63,7 +63,7 @@ int transformDkstr(char *infixStr, char *postfixStr) {
         i_inf++;
     }
 
-    if (infixStr[i_inf] == '\0') { // выталкиваем оставшиеся элемента из стека
+    if (infixStr[i_inf] == '\0') {  // выталкиваем оставшиеся элемента из стека
         tmp_stk = '~';
         tmp_stk = pop(&stack);
         while (tmp_stk != '~') {
@@ -73,6 +73,6 @@ int transformDkstr(char *infixStr, char *postfixStr) {
             i_pos++;
         }
     }
-    
+
     return 0;
 }
