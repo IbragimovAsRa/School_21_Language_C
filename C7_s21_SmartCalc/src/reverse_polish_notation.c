@@ -41,53 +41,91 @@ Node *get_postfix_notation(Node *listInfix) {
     Stack stackTokens;
     init_stack(&stackTokens);
 
-    Node currentToken = NULL;
+    Node currentToken;
 
     while (listInfix) {
         currentToken = *listInfix;
-        token_handler(currentToken);
+        token_handler(currentToken, &listPostfix, &stackTokens);
         listInfix = listInfix->next;
     }
+    // выгрузка оставшихся операторов в стеке
+    Node tmp_node;
+    while (peek(stackTokens) != NULL) {
+        tmp_node = pop(&stackTokens);
+        if (tmp_node.data.symb != ')') {
+            add_node_as_node(&listPostfix, tmp_node);
+        }
+    }
+
     return listPostfix;
 }
 
 void token_handler(Node token, Node **listPostfix, Stack *stackTokens) {
     switch (token.dataType) {
         case NUM:
-            num_solver(token.data, listPostfix);
+            num_solver(token, listPostfix);
             break;
         case SYMB:
-            symb_solver(token.data, listPostfix);
+            symb_solver(token, listPostfix, stackTokens);
             break;
-        case CMND:
-            cmnd_solver(token.data, listPostfix, stackTokens);
+        // case CMND:
+        //     cmnd_solver(token.data, listPostfix, stackTokens);
+        //     break;
+        default:
+            break;
+    }
+}
+
+void num_solver(Node token, Node **listPostfix) {
+    add_node_as_node(listPostfix, token);
+}
+
+void symb_solver(Node token, Node **listPostfix, Stack *stackTokens) {
+    int prior = get_priority(token);
+
+    //- Выталкивание из стека токенов с меньшим приоритетом:
+    Node *peekStack = peek(*stackTokens);
+    if (token.data.symb != '(') {
+        while (peekStack != NULL && get_priority(*peekStack) >= prior) {
+            if (peekStack->data.symb != '(') {
+                add_node_as_node(listPostfix, pop(stackTokens));
+            } else {
+                pop(stackTokens);
+                break;
+            }
+            peekStack = peek(*stackTokens);
+        }
+    }
+    if (token.data.symb != ')') {
+        push(stackTokens, token);
+    }
+}
+
+// void cmnd_solver(Data data, Node **listPostfix, Stack *stackTokens) {}
+
+int get_priority(Node token) {
+    int priority = 0;
+    switch (token.data.symb) {
+        case ')':
+            priority = 0;
+            break;
+        case '(':
+            priority = 1;
+            break;
+        case '+':
+        case '-':
+            priority = 2;
+            break;
+        case '*':
+        case '/':
+            priority = 3;
+            break;
+        case '^':
+            priority = 4;
             break;
         default:
-            default;
+            break;
     }
-}
-
-void num_solver(Data data, Node **listPostfix) {
-    add_node(listPostfix, data, NUM);
-}
-
-void symb_solver(Data data, Node **listPostfix, Stack *stackTokens) {
-    int priority = get_priority(data.symb);
-    //- Выталкивание из стека токенов с меньшим приоритетом:
-    Node *peekStack = peek(stackTokens);
-    Node *tmpNode = NULL;
-    while (peekStack != NULL && get_priority(peekStack) > priority ) {
-        add_node_as_node(listPostfix, *(pop(stackTokens)));
-        peekStack = peek(stackTokens);
-    }
-    //-
-}
-
-void cmnd_solver(Data data, Node **listPostfix, Stack *stackTokens) {}
-
-int get_priority(char symb) {
-    int priority
-    
-
+    return priority;
 }
 //

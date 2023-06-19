@@ -1,9 +1,7 @@
 #include "linked_list.h"
 
-void init_list(Node **head) {
-    *head = NULL;
-}
-Node *new_node(Data data, DataType dataType) { // ssgsdg
+void init_list(Node **head) { *head = NULL; }
+Node *new_node(Data data, DataType dataType) {  // ssgsdg
     Node *node;
     node = malloc(sizeof(Node));
     node->dataType = dataType;
@@ -55,7 +53,49 @@ void destroy(Node *head) {
         prev = head;
     }
 }
+
+int is_equal(Node *head1, Node *head2) {
+    int result = 0;
+    int i = 0;
+    int j = 0;
+    while (head1 != NULL && head2 != NULL) {
+        if (is_equal_token(*head1, *head2) == 1) {
+            i++;
+        }
+        head1 = head1->next;
+        head2 = head2->next;
+        j++;
+    }
+    if (head1 == NULL && head1 == NULL) {
+        result = 1;
+    } else if (i == j) {
+        result = 1;
+    }
+    return result;
+}
+int is_equal_token(Node head1, Node head2) {
+    int result = 0;
+    if (head1.dataType == head2.dataType) {
+        switch (head1.dataType) {
+            case NUM:
+                result =
+                    (fabs(head1.data.num - head2.data.num) < 10e-7) ? 1 : 0;
+                break;
+            case SYMB:
+                result = (head1.data.symb == head2.data.symb) ? 1 : 0;
+                break;
+            case CMND:
+                result =
+                    (strcmp(head1.data.cmnd, head2.data.cmnd) == 0) ? 1 : 0;
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 void print_list(Node *head) {
+    printf("\nContent of list\n");
     struct Node *ptr = head;
     int i = 0;
     while (ptr) {
@@ -77,4 +117,5 @@ void print_list(Node *head) {
         ptr = ptr->next;
         i++;
     }
+    printf("\n");
 }

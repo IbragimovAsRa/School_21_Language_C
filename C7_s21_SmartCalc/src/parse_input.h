@@ -3,7 +3,7 @@
 
 #define CMNDCOUNT 9
 
-#include "linked_list.h"
+#include "datastructs/linked_list.h"
 
 // input str -> structured linked list (должна осуществляться валидация входной
 // строки)

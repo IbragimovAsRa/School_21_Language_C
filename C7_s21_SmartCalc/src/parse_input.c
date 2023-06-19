@@ -28,7 +28,7 @@ int check_num(char **str, Node **head) {  // добавить валидацию
     int result_code = 0;
     Data tmp_data;
     char *endptr = NULL;
-    char num_str[STRMAX];
+    char num_str[STRMAX] = "!";
     int i = 0;
     while (((int)**str > 47 && (int)**str < 58) || **str == '.') {
         num_str[i] = **str;
@@ -36,6 +36,7 @@ int check_num(char **str, Node **head) {  // добавить валидацию
         *str = *str + 1;
     }
     if (i > 0) {
+        tmp_data.num = 0;
         tmp_data.num = strtod(num_str, &endptr);
         add_node(head, tmp_data, NUM);
         *str = *str - 1;
