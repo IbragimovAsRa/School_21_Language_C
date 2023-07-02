@@ -5,8 +5,9 @@
 
 // infix notation -> postfix notation
 
-Node *get_postfix_notation(
-    Node *listInfix);  // На вход поступает уже выражение прошедшее валидацию
+void infix_to_postfix_notation(
+    Node *listInfix,
+    Node **listPostfix);  // На вход поступает уже выражение прошедшее валидацию
 void token_handler(Node token, Node **listPostfix, Stack *stackTokens);
 void num_solver(Node token, Node **listPostfix);
 void symb_solver(Node token, Node **listPostfix, Stack *stackTokens);

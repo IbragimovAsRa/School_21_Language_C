@@ -12,7 +12,7 @@ void init_stack(Stack *stack);
 int is_empty(Stack stack);
 void push(Stack *stack, Node dataNode);
 Node pop(Stack *stack);
-Node *peek(Stack stack);
+Node* peek(Stack stack);
 void print_stack(Stack stack);
 
 #endif  // STACK_LIST_H

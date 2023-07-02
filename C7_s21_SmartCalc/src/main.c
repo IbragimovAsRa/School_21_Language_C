@@ -1,23 +1,26 @@
 #include "parse_input.h"
 #include "reverse_polish_notation.h"
+#include "calculations.h"
+#include "utils.h"
 
 int main() {
-    char* str1 = "2*(3^2-1)+2";
-    char* str2 = "2*(3-1)+2";
-    Node* head1 = NULL;
-    Node* head2 = NULL;
+    char* str = "2+2+2";
+    Node* infixStr = NULL;
+    Node* postfixStr = NULL;
+    double result;
+    Stack stackToken;
+    init_stack(&stackToken);
 
-    parse_input_str(str1, &head1);
-    parse_input_str(str2, &head2);
-    int result = is_equal(head1, head2);
-    printf("result = %i\n", result);
-    destroy(head2);
-    destroy(head1);
+    parse_input_str(str, &infixStr);
+    infix_to_postfix_notation(infixStr, &postfixStr);
+    list_to_stack(postfixStr, &stackToken);
+    calc(&stackToken, &result);
 
+    destroy(infixStr);
+    destroy(postfixStr);
+    printf("result = %lf\n", result);
     return 0;
 }
-
-
 
 /* Стиль
 
@@ -32,7 +35,6 @@ int main() {
 - Онлайн конвертер (https://www.semestr.online/informatics/polish.php)
 
 */
-
 
 /*  Сделать
 1) переименовать переменные кака положено

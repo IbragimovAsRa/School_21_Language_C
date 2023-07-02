@@ -34,10 +34,7 @@
 
 */
 
-Node *get_postfix_notation(Node *listInfix) {
-    Node *listPostfix;
-    init_list(&listPostfix);
-
+void infix_to_postfix_notation(Node *listInfix, Node **listPostfix) {
     Stack stackTokens;
     init_stack(&stackTokens);
 
@@ -45,19 +42,17 @@ Node *get_postfix_notation(Node *listInfix) {
 
     while (listInfix) {
         currentToken = *listInfix;
-        token_handler(currentToken, &listPostfix, &stackTokens);
+        token_handler(currentToken, listPostfix, &stackTokens);
         listInfix = listInfix->next;
     }
     // выгрузка оставшихся операторов в стеке
     Node tmp_node;
-    while (peek(stackTokens) != NULL) {
+    while (is_empty(stackTokens) == 0) {
         tmp_node = pop(&stackTokens);
         if (tmp_node.data.symb != ')') {
-            add_node_as_node(&listPostfix, tmp_node);
+            add_node_as_node(listPostfix, tmp_node);
         }
     }
-
-    return listPostfix;
 }
 
 void token_handler(Node token, Node **listPostfix, Stack *stackTokens) {

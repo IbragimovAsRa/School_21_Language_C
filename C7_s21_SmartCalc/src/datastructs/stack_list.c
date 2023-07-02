@@ -20,6 +20,6 @@ Node pop(Stack *stack) {
     }
     return result;
 }
-Node *peek(Stack stack) { return stack.top; }
+Node* peek(Stack stack) { return stack.top; }
 
 void print_stack(Stack stack) { print_list(stack.top); }
