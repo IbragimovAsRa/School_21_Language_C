@@ -1,6 +1,8 @@
 #ifndef REVERSE_POLISH_NOTATION_H
 #define REVERSE_POLISH_NOTATION_H
 
+#include <math.h>
+
 #include "datastructs/stack_list.h"
 
 // infix notation -> postfix notation

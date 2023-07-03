@@ -1,10 +1,12 @@
+#include <math.h>
+
+#include "calculations.h"
 #include "parse_input.h"
 #include "reverse_polish_notation.h"
-#include "calculations.h"
 #include "utils.h"
 
 int main() {
-    char* str = "2+2+2";
+    char* str = "-2*-5";
     Node* infixStr = NULL;
     Node* postfixStr = NULL;
     double result;
@@ -37,6 +39,8 @@ int main() {
 */
 
 /*  Сделать
-1) переименовать переменные кака положено
+1) доделать си библиотеку
+2) изучить cmake
+3) слить
 
 */

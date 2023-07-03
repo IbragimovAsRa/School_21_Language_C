@@ -8,19 +8,18 @@ main.o:
 	$(CC) $(CFLAGS) -c main.c
 
 $(LIB):	$(SOURSES_C)
-	$(CC)  -g -c $(SOURSES_C)
-	ar rcs $(LIB)  $(SOURSES_O)
-	ranlib $(LIB)
+	$(CC)  -g -c $(SOURSES_C) 
+	ar rcs $(LIB)  $(SOURSES_O) 
+	ranlib $(LIB)`
 
 main: main.o $(LIB)
-	$(CC) -g main.o $(LIB) -o main
+	$(CC) -g main.o $(LIB) -o main -lm 
 
 memcheck:	main
 	valgrind --leak-check=full --track-origins=yes ./main
 
 run: clean main
 	./main
-	clean
 
 format:
 	clang-format -i *.c *.h  datastructs/*.c datastructs/*.h

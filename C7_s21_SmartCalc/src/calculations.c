@@ -1,5 +1,7 @@
 #include "calculations.h"
 
+#include <math.h>
+
 /*
 Алгоритм:
 1) Если число - помещается в стек
@@ -50,13 +52,17 @@ void symb_handler(char symb, StackNum *stackNum) {
             push_num(stackNum, (num_1 + num_2));
             break;
         case '-':
-            push_num(stackNum, (num_1 - num_2));
+            push_num(stackNum, (num_2 - num_1));
             break;
         case '*':
             push_num(stackNum, (num_1 * num_2));
             break;
         case '/':
-            push_num(stackNum, (num_1 / num_2));
+            push_num(stackNum, (num_2 / num_1));
+            break;
+        case '^':
+            double a = pow(num_2, num_1);
+            push_num(stackNum, a);
             break;
         default:
             break;

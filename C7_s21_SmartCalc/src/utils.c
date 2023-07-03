@@ -11,3 +11,8 @@ void list_to_stack(Node *list, Stack *stack) {
         push(stack, pop(&tmpStack));
     }
 }
+
+
+// -2*-5
+
+
