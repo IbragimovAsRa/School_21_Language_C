@@ -1,0 +1,9 @@
+# ninja log v5
+1	42	1677508690406508606	CMakeFiles/C2_s21_stringplus_1.dir/src/s21_string_funcs/s21_memchr.c.o	dac55106b162af1f
+3	43	1677508690406508606	CMakeFiles/C2_s21_stringplus_1.dir/src/s21_string_funcs/s21_strcat.c.o	9c1521e940330d2e
+2	48	1677508690414508806	CMakeFiles/C2_s21_stringplus_1.dir/src/s21_string_funcs/s21_memmove.c.o	3321637080542fce
+1	49	1677508690414508806	CMakeFiles/C2_s21_stringplus_1.dir/src/s21_string_funcs/utils/s21_find_count_pattern.c.o	181ea5c4eafd3adf
+2	66	1677508690430509206	CMakeFiles/C2_s21_stringplus_1.dir/src/test_cases/case_s21_memmove.c.o	82f01d303152a445
+1	72	1677508690438509406	CMakeFiles/C2_s21_stringplus_1.dir/src/test_cases/case_s21_memcmp.c.o	62c5b2b9123ab98a
+0	78	1677508690442509506	CMakeFiles/C2_s21_stringplus_1.dir/src/s21_string_tests.c.o	a29b1d9561be2a0a
+2	79	1677508690446509606	CMakeFiles/C2_s21_stringplus_1.dir/src/test_cases/case_s21_memchr.c.o	5cb464d23fb7048f
