@@ -1,1 +1,1 @@
-# School_21_Core_Program
+# Projects of the С branch
